@@ -42,6 +42,8 @@ Plug 'alvan/vim-closetag'
 Plug 'maxmellon/vim-jsx-pretty'
 " Plug 'jupyter-vim/jupyter-vim'
 Plug 'dccsillag/magma-nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'jpalardy/vim-slime'
+Plug 'matschaffer/vim-islime2'
 Plug 'nvie/vim-flake8'
 Plug 'lervag/vimtex'
 " Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
@@ -138,9 +140,10 @@ au FileType python let b:AutoPairs = AutoPairsDefine({"f'" : "'", "r'" : "'", "b
 " run python scripts
 " source: https://stackoverflow.com/a/18948530 
 " source: https://stackoverflow.com/a/63760249
+" source: https://towardsdatascience.com/getting-started-with-vim-and-tmux-for-python-707ec5ff747f
 " autocmd FileType python map <buffer> <LocalLeader>r :w<CR>:exec '!python3 %' shellescape(@%, 1)<CR>
 " autocmd FileType python map <buffer> <F9> :w<CR>:exec '!python3' shellescape(@%, 1)<CR>
-autocmd FileType python map <buffer> <LocalLeader>r :w !python3 %<CR>
+autocmd FileType python map <buffer> <LocalLeader>r <Esc>:w<CR>: !python3 <CR>
 autocmd FileType python map <buffer> <LocalLeader>rt :split term://python3 %<CR>
 " run partial scripts in python
 " source: https://stackoverflow.com/a/40290101
@@ -165,6 +168,21 @@ let g:vimtex_quickfix_mode=0
 set conceallevel=1
 let g:tex_conceal='abdmg'
 
+" config for vim-slime
+let g:slime_target = "neovim"
+
+" config for vim-islime2
+let g:islime2_29_mode = 1 
+" nnoremap <silent> <Leader>i<CR> :ISlime2CurrentLine<CR>
+nnoremap <silent> <Leader>ij :ISlime2NextLine<CR>
+nnoremap <silent> <Leader>ik :ISlime2PreviousLine<CR>
+nnoremap <silent> <Leader>ii :set opfunc=islime2#iTermSendOperator<CR>g@
+vnoremap <silent> <Leader>ii :<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
+nnoremap <leader>cf :%y r<cr>:call islime2#iTermSendNext(@r)<CR>
+inoremap <leader>cc <Esc>vip:<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
+vnoremap <leader>cc :<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
+nnoremap <leader>cc vip:<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
+nnoremap <leader>ff :call islime2#iTermRerun()<CR>
 
 " open init.vim in horizontal splitwindow
 nnoremap <Leader>ev :split $MYVIMRC<cr>  
@@ -263,6 +281,8 @@ nnoremap <C-P> :bprev<CR>
 " remap folding key 'za' to space
 nnoremap <space> za 
 
+" use mapped key for moving vim to background (suspend the vim session)
+nnoremap <leader>bg :stop<CR>
 " settings for magma-nvim 
 " :command MI MagmaInit
 nnoremap <silent><expr> <LocalLeader>o  :MagmaEvaluateOperator<CR>
