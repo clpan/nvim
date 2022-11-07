@@ -82,22 +82,6 @@ set shortmess+=I
 set number
 set number relativenumber
 
-" highlighting
-" highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE gui=NONE guifg=DarkGrey guibg=NONE
-" highlight LineNr guifg=#050505
-" hi LineNrAbove guifg=red ctermfg=red
-" highlight LineNr ctermfg=grey
-highlight LineNr ctermfg=green
-" set hi LineNrBelow guifg=green ctermfg=green
-" try highlight single word
-" highlight MyGroup ctermfg=green
-" match TODO /self/
-syntax keyword todo self
-
-
-" syntax match oop_list "self"
-" highlight link oop_list ModeMsg
-
 " Enable searching as you type
 set incsearch
 
@@ -227,6 +211,17 @@ filetype plugin indent on
 " lightline
 set noshowmode
 let g:lightline = { 'colorscheme': 'onedark' }
+
+" highlighting, must be placed after colorscheme
+" source: https://stackoverflow.com/a/237293/20031408
+" color schema: https://vim.fandom.com/wiki/Xterm256_color_names_for_console_Vim
+" highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE gui=NONE guifg=DarkGrey guibg=NONE
+hi LineNrAbove ctermfg=190
+hi LineNrBelow ctermfg=81
+highlight LineNr ctermfg=green
+" highlight certain words: https://stackoverflow.com/a/27686668/20031408
+hi! mygroup ctermfg=141
+:match mygroup /self/
 
 " disable audible bell
 set noerrorbells visualbell t_vb=
