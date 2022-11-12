@@ -132,8 +132,8 @@ autocmd FileType python map <buffer> <LocalLeader>rt :split term://python3 %<CR>
 " run partial scripts in python
 " source: https://stackoverflow.com/a/40290101
 " may not need the '%'
-xnoremap <Leader>e :w !python3 %<cr>
-nnoremap <Leader>e :w !python3 %<cr>
+xnoremap <Leader>e :w !python3<cr>
+nnoremap <Leader>e :w !python3<cr>
 
 " put parenthesis around highlighted words
 " source: https://superuser.com/questions/875095/adding-parenthesis-around-highlighted-text-in-vim
@@ -469,12 +469,6 @@ set completeopt=menuone,longest
 " set liner to follow flake8,set line length to be 120
 let g:ale_linters = { 'python':['flake8']}
 let g:ale_python_flake8_options = '--max-line-length=120'
-
-
-" run partial scripts in python
-" source: https://stackoverflow.com/a/40290101
-xnoremap <Leader>e :w !python3<cr>
-nnoremap <Leader>e :w !python3<cr>
 
 " try to see if can auto turn off caps: - TurnOffCaps() not recognized
 " au InsertLeave * call TurnOffCaps()
