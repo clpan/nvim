@@ -42,7 +42,7 @@ Plug 'alvan/vim-closetag'
 Plug 'maxmellon/vim-jsx-pretty'
 " Plug 'jupyter-vim/jupyter-vim'
 Plug 'dccsillag/magma-nvim', { 'do': ':UpdateRemotePlugins' }
-Plug 'jpalardy/vim-slime'
+" Plug 'jpalardy/vim-slime'
 Plug 'matschaffer/vim-islime2'
 Plug 'nvie/vim-flake8'
 Plug 'lervag/vimtex'
@@ -85,6 +85,10 @@ set number relativenumber
 " Enable searching as you type
 set incsearch
 
+" turn off search highlighting. source: https://stackoverflow.com/a/25569434
+" set nohlsearch    " this permanently disable highlighing when searching
+nnoremap <C-l> :nohlsearch<CR><C-L>
+
 " sane text files
 set fileformat=unix
 set encoding=utf-8
@@ -109,8 +113,11 @@ set updatetime=300
 " Always show the signcolumn, otherwise it would shift the text each time
 " diagnostics appear/become resolved.
 set signcolumn=yes
-
 " end setup for coc.nvim ---
+
+" set leader key
+let mapleader = ","
+let maplocalleader = ","
 
 " set viminfo='25,\"50,n~/.viminfo
 autocmd FileType html setlocal tabstop=2 shiftwidth=2 softtabstop=2
@@ -141,10 +148,6 @@ nnoremap <Leader>e :w !python3<cr>
 " try auto-disable cap - unsure if it works - does not work
 " au InsertLeave * call TurnOffCaps()
 
-" key mapping
-let mapleader = ","
-let maplocalleader = ","
-
 " setup for latex
 let g:vimtex_view_method='skim'
 let g:tex_flavor='latex'
@@ -152,25 +155,37 @@ let g:vimtex_quickfix_mode=0
 set conceallevel=1
 let g:tex_conceal='abdmg'
 
+let g:slime_preserve_curpos = 0
+
 " config for vim-slime
 let g:slime_target = "neovim"
 
-" config for vim-islime2
+" config for vim-islime2 ====
 let g:islime2_29_mode = 1 
-" nnoremap <silent> <Leader>i<CR> :ISlime2CurrentLine<CR>
+" autocmd FileType python     nnoremap <buffer><leader>rf :%y r<cr>:call islime2#iTermSendNext(@r)<CR>
+nnoremap <silent> <Leader>il :ISlime2CurrentLine<CR>
 nnoremap <silent> <Leader>ij :ISlime2NextLine<CR>
+vnoremap <silent> <Leader>ij :ISlime2NextLine<CR>
 nnoremap <silent> <Leader>ik :ISlime2PreviousLine<CR>
-nnoremap <silent> <Leader>ii :set opfunc=islime2#iTermSendOperator<CR>g@
+vnoremap <silent> <Leader>ik :ISlime2PreviousLine<CR>
+nnoremap <silent> <Leader>ii :set opfunc=islime2#iTermSendOperator<CR>
 vnoremap <silent> <Leader>ii :<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
 nnoremap <leader>cf :%y r<cr>:call islime2#iTermSendNext(@r)<CR>
 inoremap <leader>cc <Esc>vip:<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
 vnoremap <leader>cc :<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
 nnoremap <leader>cc vip:<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
 nnoremap <leader>ff :call islime2#iTermRerun()<CR>
+nnoremap <leader>fp :call islime2#iTermSendUpEnter()<CR>
+" modify so that different filetype using the same keybind will function
+" differently. (for both python & R (Nvim-R)
+
+" settings for R ----
+" autocmd FileType r     nnoremap <buffer><leader>rs <Plug>:RStart
+" activate shortcut by file type - for Python and R
+" source: https://vi.stackexchange.com/a/10666
 
 " open init.vim in horizontal splitwindow
 nnoremap <Leader>ev :split $MYVIMRC<cr>  
-" source 
 nnoremap <leader>sv :source $MYVIMRC<cr>
 
 " word movement
@@ -219,7 +234,7 @@ let g:lightline = { 'colorscheme': 'onedark' }
 hi LineNrAbove ctermfg=190
 hi LineNrBelow ctermfg=81
 highlight LineNr ctermfg=green
-" highlight certain words: https://stackoverflow.com/a/27686668/20031408
+" highlight certain words: source: https://stackoverflow.com/a/27686668/20031408
 hi! mygroup ctermfg=141
 :match mygroup /self/
 
@@ -250,19 +265,14 @@ set clipboard=unnamed
 set foldmethod=indent
 set foldlevel=99
 
-
 " keybinding to increase productivity:
 " source: https://stackoverflow.com/a/21761782/20031408
-nnoremap ; :
-vnoremap ; :
-
+" nnoremap ; :
+" vnoremap ; :
 
 " command remap :W -> :w, Magma-nvim command
 " source: https://stackoverflow.com/a/3879737/20031408
 cnoreabbrev <expr> W ((getcmdtype() is# ':' && getcmdline() is# 'W')?('w'):('W'))
-cnoreabbrev <expr> mi ((getcmdtype() is# ':' && getcmdline() is# 'mi') ? ('MagmaInit python3'):('mi'))
-cnoreabbrev <expr> md ((getcmdtype() is# ':' && getcmdline() is# 'md') ? ('MagmaDeinit'):('md'))
-
 
 " wrap toggle
 setlocal nowrap
@@ -272,14 +282,15 @@ noremap <silent> <Leader>w :call ToggleWrap()<CR>
 nnoremap <C-N> :bnext<CR>
 nnoremap <C-P> :bprev<CR>
 
-
 " remap folding key 'za' to space
 nnoremap <space> za 
 
 " use mapped key for moving vim to background (suspend the vim session)
 nnoremap <leader>bg :stop<CR>
+
 " settings for magma-nvim 
-" :command MI MagmaInit
+cnoreabbrev <expr> mi ((getcmdtype() is# ':' && getcmdline() is# 'mi') ? ('MagmaInit python3'):('mi'))
+cnoreabbrev <expr> md ((getcmdtype() is# ':' && getcmdline() is# 'md') ? ('MagmaDeinit'):('md'))
 nnoremap <silent><expr> <LocalLeader>o  :MagmaEvaluateOperator<CR>
 nnoremap <silent>       <LocalLeader>rr :MagmaEvaluateLine<CR>
 xnoremap <silent>       <LocalLeader>rr :<C-U>MagmaEvaluateVisual<CR>
@@ -289,7 +300,6 @@ nnoremap <silent>       <LocalLeader>ro :MagmaShowOutput<CR>
 
 let g:magma_automatically_open_output = v:false
 " let g:magma_image_provider = "ueberzug"
-
 
 function ToggleWrap()
     if &wrap
@@ -348,9 +358,7 @@ let NERDTreeIgnore = ['\.pyc$', '__pycache__']
 let NERDTreeMinimalUI = 1
 let g:nerdtree_open = 0
 
-
 :let g:netrw_browser_viewer='open'
-
 
 " automatically change the current directory and set it as working dir
 set autochdir
@@ -358,8 +366,6 @@ set autochdir
 " NERDTree automatically change directory and enter that dir once a new
 " directory is selected-- below let g:xxxx does not seem to work
 " let g:NERDTreeChDirMode = 2
-"
-"
 
 "NREDTREE Keybind and setting
 nnoremap <leader>n :NERDTreeToggle<CR>
@@ -389,12 +395,12 @@ autocmd VimEnter * NERDTree
 
 " commeting 
 " source: https://stackoverflow.com/a/22246318
-autocmd FileType c,cpp,java,scala let b:comment_leader = '//'
-autocmd FileType sh,ruby,python   let b:comment_leader = '#'
-autocmd FileType conf,fstab       let b:comment_leader = '#'
-autocmd FileType tex              let b:comment_leader = '%'
-autocmd FileType mail             let b:comment_leader = '>'
-autocmd FileType vim              let b:comment_leader = '"'
+autocmd FileType c,cpp,java,scala     let b:comment_leader = '//'
+autocmd FileType sh,ruby,python,r     let b:comment_leader = '#'
+autocmd FileType conf,fstab           let b:comment_leader = '#'
+autocmd FileType tex                  let b:comment_leader = '%'
+autocmd FileType mail                 let b:comment_leader = '>'
+autocmd FileType vim                  let b:comment_leader = '"'
 function! CommentToggle()
     execute ':silent! s/\([^ ]\)/' . escape(b:comment_leader,'\/') . ' \1/'
     execute ':silent! s/^\( *\)' . escape(b:comment_leader,'\/') . ' \?' . escape(b:comment_leader,'\/') . ' \?/\1/'
