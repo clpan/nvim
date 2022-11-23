@@ -89,6 +89,10 @@ set incsearch
 " set nohlsearch    " this permanently disable highlighing when searching
 nnoremap <C-l> :nohlsearch<CR><C-L>
 
+" search for visually selected text by using //. source:
+" https://vim.fandom.com/wiki/Search_for_visually_selected_text
+vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
+
 " sane text files
 set fileformat=unix
 set encoding=utf-8
@@ -134,7 +138,8 @@ au FileType python let b:AutoPairs = AutoPairsDefine({"f'" : "'", "r'" : "'", "b
 " source: https://towardsdatascience.com/getting-started-with-vim-and-tmux-for-python-707ec5ff747f
 " autocmd FileType python map <buffer> <LocalLeader>r :w<CR>:exec '!python3 %' shellescape(@%, 1)<CR>
 " autocmd FileType python map <buffer> <F9> :w<CR>:exec '!python3' shellescape(@%, 1)<CR>
-autocmd FileType python map <buffer> <LocalLeader>r <Esc>:w<CR>: !python3 <CR>
+autocmd FileType python map <buffer> <LocalLeader>r <Esc>:w<CR>: !python3<CR>
+autocmd FileType python map <buffer> <LocalLeader>rf <Esc>:w<CR>: !python3 %<CR>
 autocmd FileType python map <buffer> <LocalLeader>rt :split term://python3 %<CR>
 " run partial scripts in python
 " source: https://stackoverflow.com/a/40290101
