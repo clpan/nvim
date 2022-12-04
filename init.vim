@@ -336,11 +336,18 @@ function ToggleWrap()
 endfunction
 
 " move through split windows
-nnoremap ˚ :wincmd k<CR>
-nnoremap ∆ :wincmd j<CR>
-nnoremap ˙ :wincmd h<CR>
-nnoremap ¬ :wincmd l<CR>
-
+" OS dependent command. source: https://vi.stackexchange.com/questions/2572/detect-os-in-vimscript
+if has('mac')
+    nnoremap ˚ :wincmd k<CR>
+    nnoremap ∆ :wincmd j<CR>
+    nnoremap ˙ :wincmd h<CR>
+    nnoremap ¬ :wincmd l<CR>
+elseif has('linux')
+    nnoremap <A-k> :wincmd k<CR>
+    nnoremap <A-j> :wincmd j<CR>
+    nnoremap <A-h> :wincmd h<CR>
+    nnoremap <A-l> :wincmd l<CR>
+endif
 " move through buffers
 " nmap <leader>[ :bp!<CR>
 " nmap <leader>] :bn!<CR>
