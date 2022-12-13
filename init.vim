@@ -12,6 +12,13 @@ if has("nvim")
     au BufLeave term://* AcpEnable
 endif
 
+" vscode config
+if exists('g:vscode')
+    " VSCode extension
+else
+    " ordinary Neovim
+endif
+
 " disable plugin auto-pair keybind <C-h> before loading
 let g:AutoPairsMapCh = 0
 
@@ -47,7 +54,7 @@ Plug 'matschaffer/vim-islime2'
 Plug 'nvie/vim-flake8'
 Plug 'lervag/vimtex'
 " Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
-"
+        " PLug ''
 
 call plug#end()
 
@@ -70,6 +77,11 @@ set exrc
 
 " always show the status bar
 set laststatus=2
+
+" show whitespace. Must be inserted before colorscheme command
+" source https://www.youtube.com/watch?v=YhqsjUUHj6g
+autocmd Colorscheme * highlight ExtraWhitespace ctermbg=red guibg=red
+au InsertLeave * match ExtraWhitespace /\s\+s$/
 
 " enable 256 colors
 set t_Co=256
@@ -105,10 +117,17 @@ set softtabstop=4
 set colorcolumn=120
 set expandtab
 
+" easy formatting for paragraphs
+" source: https://www.youtube.com/watch?v=YhqsjUUHj6g
+vmap QQ gq
+nmap QQ gqap
+
 " setups for coc.nvim ---
 " Some servers have issues with backup files, see #649.
+" source: https://www.youtube.com/watch?v=YhqsjUUHj6g
 set nobackup
 set nowritebackup
+set noswapfile
 
 " Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
 " delays and poor user experience.
@@ -199,6 +218,9 @@ nmap <S-Left> b
 imap <S-Right> <Esc><Right>wi
 nmap <S-Right> w
 
+" map :sort to a key, source: https://www.youtube.com/watch?v=YhqsjUUHj6g
+vnoremap <leader>s :sort<CR>
+
 " indent/unindent with tab/shift-tab
 nmap <Tab> >>
 nmap <S-tab> <<
@@ -267,7 +289,9 @@ set splitright
 set clipboard=unnamed
 
 " code folding
+" source: https://stackoverflow.com/a/360634
 set foldmethod=indent
+set foldnestmax=2
 set foldlevel=99
 
 " keybinding to increase productivity:
@@ -289,6 +313,7 @@ nnoremap <C-P> :bprev<CR>
 
 " remap folding key 'za' to space
 nnoremap <space> za 
+vnoremap <space> zf
 
 " use mapped key for moving vim to background (suspend the vim session)
 nnoremap <leader>bg :stop<CR>
