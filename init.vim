@@ -105,6 +105,11 @@ nnoremap <C-l> :nohlsearch<CR><C-L>
 " https://vim.fandom.com/wiki/Search_for_visually_selected_text
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 
+" captalize/lowercase first character of each words in one line
+" souce: https://stackoverflow.com/questions/17440659/capitalize-first-letter-of-each-word-in-a-selection-using-vim
+vnoremap <leader>C :s/\<./\u&/g<CR>:noh<CR>
+vnoremap <leader>c :s/\<./\U&/g<CR>:noh<CR>
+
 " sane text files
 set fileformat=unix
 set encoding=utf-8
