@@ -51,7 +51,9 @@ Plug 'maxmellon/vim-jsx-pretty'
 Plug 'dccsillag/magma-nvim', { 'do': ':UpdateRemotePlugins' }
 " Plug 'jpalardy/vim-slime'
 Plug 'matschaffer/vim-islime2'
+Plug 'vim-syntastic/syntastic'
 Plug 'nvie/vim-flake8'
+Plug 'davidhalter/jedi-vim'
 Plug 'lervag/vimtex'
 " Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
         " PLug ''
@@ -107,8 +109,7 @@ vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 
 " captalize/lowercase first character of each words in one line
 " souce: https://stackoverflow.com/questions/17440659/capitalize-first-letter-of-each-word-in-a-selection-using-vim
-vnoremap <leader>C :s/\<./\u&/g<CR>:noh<CR>
-vnoremap <leader>c :s/\<./\U&/g<CR>:noh<CR>
+vnoremap <leader>u :s/\<./\U&/g<CR>:noh<CR>
 
 " sane text files
 set fileformat=unix
