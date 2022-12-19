@@ -292,7 +292,9 @@ set splitbelow
 set splitright
 
 " allows using system clipboard to copy & paste
+" source: https://unix.stackexchange.com/a/12571
 set clipboard=unnamed
+set clipboard=unnamedplus
 
 " code folding
 " source: https://stackoverflow.com/a/360634
@@ -460,10 +462,10 @@ let g:tagbar_ctags_bin = "/usr/local/bin/ctags"
 map <leader>t :TagbarToggle<CR>
 
 " copy, cut and paste 
-vnoremap <C-c> "+y
-vnoremap <C-x> "+c
-vnoremap <C-v> c<ESC>"+p
-inoremap <C-v><ESC>"+pa 
+" vnoremap <C-c> "+y
+" vnoremap <C-x> "+c
+" vnoremap <C-v> c<ESC>"+p
+" inoremap <C-v><ESC>"+pa 
 
 " disable keys - disable capital J to join lines
 noremap J <nop>
