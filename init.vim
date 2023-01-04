@@ -27,8 +27,8 @@ call plug#begin()
 Plug 'tpope/vim-sensible'
 Plug 'itchyny/lightline.vim'
 Plug 'joshdick/onedark.vim'
-" Plug 'vim-airline/vim-airline' 
-" Plug 'vim-airline/vim-airline-themes' 
+" Plug 'vim-airline/vim-airline'
+" Plug 'vim-airline/vim-airline-themes'
 Plug 'ap/vim-buftabline'
 Plug 'airblade/vim-gitgutter'
 Plug 'jalvesaq/Nvim-R', {'branch': 'stable'}
@@ -71,7 +71,7 @@ if need_to_install_plugins == 1
 endif
 
 " source .vimrc if there's one in the directory - allow project-specific vimrc
-set exrc 
+set exrc
 
 " set shell to iterm2 to plot matplotlib figures
 " set shell=/Applications/iTerm.app/Contents/MacOS/iTerm2
@@ -81,16 +81,49 @@ set exrc
 set laststatus=2
 
 " show whitespace. Must be inserted before colorscheme command
-" source https://www.youtube.com/watch?v=YhqsjUUHj6g
-autocmd Colorscheme * highlight ExtraWhitespace ctermbg=red guibg=red
-au InsertLeave * match ExtraWhitespace /\s\+s$/
+
+" autocmd Colorscheme * highlight ExtraWhitespace ctermbg=red guibg=red
+" au InsertLeave * match ExtraWhitespace /\s\+s$/
+" :match ExtraWhitespace /\s\+$\| \+\ze\t/| /^\t*\zs \+/
+
+" source: https://vim.fandom.com/wiki/Highlight_unwanted_spaces
+" show all tabs
+:command HT /\t
+" show trailing whitespace after text
+:command HS /\S\zs\s\+$
+" :command HS2 :%s/\s\+$//e
+" show space before a tab
+:command HST / \+\ze\t
+
+" trim whitespace
+" source: https://vim.fandom.com/wiki/Remove_unwanted_spaces#Display_or_remove_unwanted_whitespace_with_a_script
+" source: https://vi.stackexchange.com/questions/454/whats-the-simplest-way-to-strip-trailing-whitespace-from-all-lines-in-a-file
+function ShowSpaces(...)
+  let @/='\v(\s+$)|( +\ze\t)'
+  let oldhlsearch=&hlsearch
+  if !a:0
+    let &hlsearch=!&hlsearch
+  else
+    let &hlsearch=a:1
+  end
+  return oldhlsearch
+endfunction
+
+function DHS() range
+  let oldhlsearch=ShowSpaces(1)
+  execute a:firstline.",".a:lastline."substitute ///gec"
+  let &hlsearch=oldhlsearch
+endfunction
+
+" command -bar -nargs=? ShowSpaces call ShowSpaces(<args>)
+command -bar -nargs=0 -range=% DHS <line1>,<line2>call DHS()
 
 " enable 256 colors
 set t_Co=256
 " set t_ut=  " this disables Background Color Erase
 
 " disable the default Vim startup message
-set shortmess+=I  
+set shortmess+=I
 
 " turn on line numbering
 set number
@@ -152,13 +185,13 @@ let maplocalleader = ","
 autocmd FileType html setlocal tabstop=2 shiftwidth=2 softtabstop=2
 autocmd FileType css setlocal tabstop=2 shiftwidth=2 softtabstop=2
 autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2
-nmap Q <Nop> 
+nmap Q <Nop>
 
 " auto-pairs
 au FileType python let b:AutoPairs = AutoPairsDefine({"f'" : "'", "r'" : "'", "b'" : "'"})
 
 " run python scripts
-" source: https://stackoverflow.com/a/18948530 
+" source: https://stackoverflow.com/a/18948530
 " source: https://stackoverflow.com/a/63760249
 " source: https://towardsdatascience.com/getting-started-with-vim-and-tmux-for-python-707ec5ff747f
 " autocmd FileType python map <buffer> <LocalLeader>r :w<CR>:exec '!python3 %' shellescape(@%, 1)<CR>
@@ -191,7 +224,7 @@ let g:slime_preserve_curpos = 0
 let g:slime_target = "neovim"
 
 " config for vim-islime2 ====
-let g:islime2_29_mode = 1 
+let g:islime2_29_mode = 1
 " autocmd FileType python     nnoremap <buffer><leader>rf :%y r<cr>:call islime2#iTermSendNext(@r)<CR>
 nnoremap <silent> <Leader>il :ISlime2CurrentLine<CR>
 nnoremap <silent> <Leader>ij :ISlime2NextLine<CR>
@@ -215,7 +248,7 @@ nnoremap <leader>fp :call islime2#iTermSendUpEnter()<CR>
 " source: https://vi.stackexchange.com/a/10666
 
 " open init.vim in horizontal splitwindow
-nnoremap <Leader>ev :split $MYVIMRC<cr>  
+nnoremap <Leader>ev :split $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
 
 " word movement
@@ -268,8 +301,9 @@ hi LineNrAbove ctermfg=190
 hi LineNrBelow ctermfg=81
 highlight LineNr ctermfg=green
 " highlight certain words: source: https://stackoverflow.com/a/27686668/20031408
+" source: https://stackoverflow.com/a/15288278/20031408
 hi! mygroup ctermfg=141
-:match mygroup /self/
+:match mygroup /\<self\>/
 
 " disable audible bell
 set noerrorbells visualbell t_vb=
@@ -320,13 +354,13 @@ nnoremap <C-N> :bnext<CR>
 nnoremap <C-P> :bprev<CR>
 
 " remap folding key 'za' to space
-nnoremap <space> za 
+nnoremap <space> za
 vnoremap <space> zf
 
 " use mapped key for moving vim to background (suspend the vim session)
 nnoremap <leader>bg :stop<CR>
 
-" settings for magma-nvim 
+" settings for magma-nvim
 cnoreabbrev <expr> mi ((getcmdtype() is# ':' && getcmdline() is# 'mi') ? ('MagmaInit python3'):('mi'))
 cnoreabbrev <expr> md ((getcmdtype() is# ':' && getcmdline() is# 'md') ? ('MagmaDeinit'):('md'))
 nnoremap <silent><expr> <LocalLeader>o  :MagmaEvaluateOperator<CR>
@@ -386,8 +420,8 @@ endif
 " nmap <leader>] :bn!<CR>
 nnoremap <leader>x :bp<bar>bd#<CR>
 nnoremap <leader>x! :bp<bar>bd#!<CR>
-nnoremap <M-f> :bn!<CR> 
-nnoremap <M-b> :bp!<CR> 
+nnoremap <M-f> :bn!<CR>
+nnoremap <M-b> :bp!<CR>
 
 " split term
 " source: https://www.reddit.com/r/neovim/comments/ezt2cu/making_neovims_terminal_behave_more_like_vims/
@@ -438,7 +472,7 @@ autocmd VimEnter * call StartUp()
 " Auto-enable NERDTree once open
 autocmd VimEnter * NERDTree
 
-" commeting 
+" commeting
 " source: https://stackoverflow.com/a/22246318
 autocmd FileType c,cpp,java,scala     let b:comment_leader = '//'
 autocmd FileType sh,ruby,python,r     let b:comment_leader = '#'
@@ -461,16 +495,16 @@ map <C-r> <Plug>(ale_previous_wrap)
 let g:tagbar_ctags_bin = "/usr/local/bin/ctags"
 map <leader>t :TagbarToggle<CR>
 
-" copy, cut and paste 
+" copy, cut and paste
 " vnoremap <C-c> "+y
 " vnoremap <C-x> "+c
 " vnoremap <C-v> c<ESC>"+p
-" inoremap <C-v><ESC>"+pa 
+" inoremap <C-v><ESC>"+pa
 
 " disable keys - disable capital J to join lines
 noremap J <nop>
 " remap join line (capital J) to ctrl + J
-nnoremap <C-j> J  
+nnoremap <C-j> J
 
 " move to the right w/o leaving INSERT mode
 inoremap <C-l> <Right>
