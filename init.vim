@@ -19,12 +19,18 @@ else
     " ordinary Neovim
 endif
 
+" clone vim-snippets to nvim subfolder. source: chatgpt :P
+:if !isdirectory("~/.config/nvim/vim-snippets")
+    :execute "!mkdir -p ~/.config/nvim/vim-snippets"
+    :execute "!git clone https://github.com/honza/vim-snippets ~/.config/nvim/vim-snippets"
+:endif
+
 " disable plugin auto-pair keybind <C-h> before loading
 let g:AutoPairsMapCh = 0
 
 call plug#begin()
 " call plug#begin("~/.nvim/plugged")
-Plug 'tpope/vim-sensible'
+" Plug 'tpope/vim-sensible'
 Plug 'itchyny/lightline.vim'
 Plug 'joshdick/onedark.vim'
 " Plug 'vim-airline/vim-airline'
@@ -55,10 +61,17 @@ Plug 'vim-syntastic/syntastic'
 Plug 'nvie/vim-flake8'
 Plug 'davidhalter/jedi-vim'
 Plug 'lervag/vimtex'
+Plug 'xuhdev/vim-latex-live-preview'
+Plug 'SirVer/ultisnips'
+" Plug 'honza/vim-snippets'
 " Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
         " PLug ''
 
 call plug#end()
+
+:command PI :PlugInstall
+:command PU :PlugUpdate
+:command PC :PlugClean
 
 filetype plugin indent on
 syntax on
@@ -211,17 +224,30 @@ nnoremap <Leader>e :w !python3<cr>
 " try auto-disable cap - unsure if it works - does not work
 " au InsertLeave * call TurnOffCaps()
 
-" setup for latex
-let g:vimtex_view_method='skim'
+" setup for latex ====
+" config for vim-tex
+" source: https://web.ma.utexas.edu/users/vandyke/notes/getting_started_latex_vim/getting_started.pdf
+" let g:vimtex_view_method='skim'
 let g:tex_flavor='latex'
 let g:vimtex_quickfix_mode=0
 set conceallevel=1
 let g:tex_conceal='abdmg'
 
-let g:slime_preserve_curpos = 0
+" config for vim-latex-live-preview
+" source: https://medium.com/rahasak/vim-as-my-latex-editor-f0c5d60c66fa
+autocmd FileType tex setl updatetime=1
+let g:livepreview_previewer = 'open -a Preivew'
+
+" config for snippet: UltiSnips ====
+" make sure to store honza/vim-snippets repo to the following dir:
+let g:UltiSnipsSnippetDirectories=[$HOME.'/.config/nvim/vim-snippets/UltiSnips']
+let g:UltiSnipsExpandTrigger  = '<Tab>'
+let g:UltiSnipsJumpForwardTrigger = '<Tab>'
+let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
 
 " config for vim-slime
 let g:slime_target = "neovim"
+let g:slime_preserve_curpos = 0
 
 " config for vim-islime2 ====
 let g:islime2_29_mode = 1
@@ -261,11 +287,12 @@ nmap <S-Right> w
 vnoremap <leader>s :sort<CR>
 
 " indent/unindent with tab/shift-tab
-nmap <Tab> >>
-nmap <S-tab> <<
-imap <S-Tab> <Esc><<i
-vmap <Tab> >gv
-vmap <S-Tab> <gv
+" source: https://stackoverflow.com/a/46541477/20031408
+" nmap <Tab> >>
+" nmap <S-tab> <<
+" imap <S-Tab> <Esc><<i
+" vmap <Tab> >gv
+" vmap <S-Tab> <gv
 
 " mouse
 set mouse=a
