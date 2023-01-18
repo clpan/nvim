@@ -21,8 +21,8 @@ endif
 
 " clone vim-snippets to nvim subfolder. source: chatgpt :P
 :if !isdirectory("~/.config/nvim/vim-snippets")
-    :execute "!mkdir -p ~/.config/nvim/vim-snippets"
-    :execute "!git clone https://github.com/honza/vim-snippets ~/.config/nvim/vim-snippets"
+    :silent execute "!mkdir -p ~/.config/nvim/vim-snippets"
+    :silent execute "!git clone https://github.com/honza/vim-snippets ~/.config/nvim/vim-snippets"
 :endif
 
 " disable plugin auto-pair keybind <C-h> before loading
@@ -47,7 +47,7 @@ Plug 'tpope/vim-surround'
 Plug 'dense-analysis/ale'
 Plug 'preservim/tagbar'
 Plug 'vim-scripts/indentpython.vim'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'vim-scripts/AutoComplPop'
 Plug 'lepture/vim-jinja'
 Plug 'pangloss/vim-javascript'
@@ -55,15 +55,25 @@ Plug 'alvan/vim-closetag'
 Plug 'maxmellon/vim-jsx-pretty'
 " Plug 'jupyter-vim/jupyter-vim'
 Plug 'dccsillag/magma-nvim', { 'do': ':UpdateRemotePlugins' }
-" Plug 'jpalardy/vim-slime'
+Plug 'jpalardy/vim-slime'
 Plug 'matschaffer/vim-islime2'
 Plug 'vim-syntastic/syntastic'
 Plug 'nvie/vim-flake8'
 Plug 'davidhalter/jedi-vim'
+Plug 'deoplete-plugins/deoplete-jedi'
 Plug 'lervag/vimtex'
 Plug 'xuhdev/vim-latex-live-preview'
 Plug 'SirVer/ultisnips'
-" Plug 'honza/vim-snippets'
+Plug 'edluffy/hologram.nvim', {'auto_display': 'true'}
+" Plug 'edluffy/hologram.nvim'
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-media-files.nvim'
+Plug 'honza/vim-snippets'
+" colorscheme
+Plug 'romgrk/doom-one.vim'
+" Plug 'bennypowers/nvim-regexplainer'
 " Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
         " PLug ''
 
@@ -203,6 +213,52 @@ nmap Q <Nop>
 " auto-pairs
 au FileType python let b:AutoPairs = AutoPairsDefine({"f'" : "'", "r'" : "'", "b'" : "'"})
 
+" setup telescope to view images
+" require('telescope').load_extension('media_files')
+" require'telescope'.setup {
+  " extensions = {
+    " media_files = {
+      " -- filetypes whitelist
+      " -- defaults to {"png", "jpg", "mp4", "webm", "pdf"}
+      " filetypes = {"png", "webp", "jpg", "jpeg"},
+      " find_cmd = "rg" -- find command (defaults to `fd`)
+    " }
+  " },
+" }
+
+let g:telescope_preview_options = {
+    \ 'options': {
+        \ 'image_formats': ['png', 'jpg', 'jpeg', 'gif'],
+    \ },
+    \ 'mappings': {
+        \ 'preview': '<CR>',
+        \ },
+    \ }
+
+" Setup Hologram for image display in neovim
+" source: https://github.com/edluffy/hologram.nvim/issues/17#issuecomment-1314562139
+lua << EOF
+require'hologram'.setup{
+    auto_display = true -- WIP automatic markdown image display, may be prone to breaking
+}
+EOF
+
+let g:hologram_theme = 'custom'
+let g:hologram_custom_theme = {
+      \ 'delimiter': ['<DELIM>', '</DELIM>'],
+      \ 'image_formats': ['png'],
+      \ }
+
+" Optional: set a custom output directory
+let g:hologram_output_dir = '~/hologram_images'
+
+" Optional: set a custom file extension
+let g:hologram_file_extension = 'png'
+
+" Optional: set a custom image width
+let g:hologram_width = 800
+
+
 " run python scripts
 " source: https://stackoverflow.com/a/18948530
 " source: https://stackoverflow.com/a/63760249
@@ -218,6 +274,27 @@ autocmd FileType python map <buffer> <LocalLeader>rt :split term://python3 %<CR>
 xnoremap <Leader>e :w !python3<cr>
 nnoremap <Leader>e :w !python3<cr>
 
+" config for jed-vim for python ====
+" source: https://stackoverflow.com/a/33752169
+" source: https://stackoverflow.com/q/18279658
+let g:jedi#use_tabs_not_buffers = 1
+let g:jedi#use_splits_not_buffers = "right"
+let g:jedi#usages_command = "<leader>u"
+let g:jedi#show_call_signatures = "2"
+let g:jedi#goto_command = "<leader>d"
+let g:jedi#goto_assignments_command = "<leader>g"
+let g:jedi#rename_command = "<leader>m"
+let g:jedi#rename_command_keep_name = "<leader>M"
+let g:jedi#completion_command = "<C-Space>"
+" let g:jedi#completions_enabled = 0
+" let g:jedi#goto_definition_command = "<leader>d"
+" let g:jedi#get_definition_command = "<leader>d"
+" let g:jedi#autocompletion_command = "<C-Space>"
+" == if jedi is very slow after initial completion, try: 
+" let g:pymode_rope = 0
+" let g:jedi#show_call_signatures = 0
+
+
 " put parenthesis around highlighted words
 " source: https://superuser.com/questions/875095/adding-parenthesis-around-highlighted-text-in-vim
 " xnoremap <leader>s xi()<Esc>P
@@ -232,46 +309,108 @@ let g:tex_flavor='latex'
 let g:vimtex_quickfix_mode=0
 set conceallevel=1
 let g:tex_conceal='abdmg'
+nnoremap <localleader>c <Cmd>update<CR><Cmd>VimtexCompileSS<CR>
+nnoremap <LocalLeader>vs <Cmd>VimtexStop<CR>
+nnoremap <LocalLeader>v <Cmd>VimtexView<CR>
+" Don't open QuickFix for warning messages if no errors are present
+let g:vimtex_quickfix_open_on_warning = 0  
+let g:vimtex_quickfix_ignore_filters = [
+      \ 'Underfull \\hbox',
+      \ 'Overfull \\hbox',
+      \ 'LaTeX Warning: .\+ float specifier changed to',
+      \ 'LaTeX hooks Warning',
+      \ 'Package siunitx Warning: Detected the "physics" package:',
+      \ 'Package hyperref Warning: Token not allowed in a PDF string',
+      \]
+
+let g:vimtex_view_method = "zathura"
+
 
 " config for vim-latex-live-preview
 " source: https://medium.com/rahasak/vim-as-my-latex-editor-f0c5d60c66fa
 autocmd FileType tex setl updatetime=1
-let g:livepreview_previewer = 'open -a Preivew'
+if has('mac')
+    let g:livepreview_previewer = 'open -a Preivew'
+elseif has('linux')
+    let g:livepreview_previewer = 'open -a zathura'
+endif
 
 " config for snippet: UltiSnips ====
 " make sure to store honza/vim-snippets repo to the following dir:
+" this require python3 and pynvim installed.
 let g:UltiSnipsSnippetDirectories=[$HOME.'/.config/nvim/vim-snippets/UltiSnips']
 let g:UltiSnipsExpandTrigger  = '<Tab>'
 let g:UltiSnipsJumpForwardTrigger = '<Tab>'
 let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
-
-" config for vim-slime
-let g:slime_target = "neovim"
-let g:slime_preserve_curpos = 0
-
-" config for vim-islime2 ====
-let g:islime2_29_mode = 1
-" autocmd FileType python     nnoremap <buffer><leader>rf :%y r<cr>:call islime2#iTermSendNext(@r)<CR>
-nnoremap <silent> <Leader>il :ISlime2CurrentLine<CR>
-nnoremap <silent> <Leader>ij :ISlime2NextLine<CR>
-vnoremap <silent> <Leader>ij :ISlime2NextLine<CR>
-nnoremap <silent> <Leader>ik :ISlime2PreviousLine<CR>
-vnoremap <silent> <Leader>ik :ISlime2PreviousLine<CR>
-nnoremap <silent> <Leader>ii :set opfunc=islime2#iTermSendOperator<CR>
-vnoremap <silent> <Leader>ii :<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
-nnoremap <leader>cf :%y r<cr>:call islime2#iTermSendNext(@r)<CR>
-inoremap <leader>cc <Esc>vip:<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
-vnoremap <leader>cc :<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
-nnoremap <leader>cc vip:<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
-nnoremap <leader>ff :call islime2#iTermRerun()<CR>
-nnoremap <leader>fp :call islime2#iTermSendUpEnter()<CR>
-" modify so that different filetype using the same keybind will function
-" differently. (for both python & R (Nvim-R)
-
+" open snippets files with user defined command, type :Texs to open tex.snippets horizontally
+let g:tex_snippets_path = expand("~/.config/nvim/vim-snippets/UltiSnips/tex.snippets")
+command! Texs execute "split" . g:tex_snippets_path
+" add a keybind to reload snippets after making changes. source: https://ejmastnak.github.io/tutorials/vim-latex/ultisnips.html#tip-refreshing-snippets
+" unresolved - function not found #TODO
+nnoremap <leader>rl <cmd>call UtilSnips#RefreshSnippets()<CR>
+" config for vim-slime and vim-islime2 ====
+" use <C-c><C-c> to send script to target terminal for REPL
+" also need to add `map c-c<Esc>` in "/kitty.conf"
+if has('linux')
+    let g:slime_jobid = "ipython"
+    " let g:slime_target = "neovim"
+    if $TERM == "xterm-kitty"
+        let g:slime_target = "kitty"
+        " echo 'g:slime_target = ' . g:slime_target
+        " :echom 'g:slime_target = ' . g:slime_target
+        let g:slime_kitty_socket = system("echo $KITTY_LISTEN_ON")
+        " let g:slime_kitty_socket = "unix:/tmp/mykitty-3275"
+        let g:slime_cmd = "kitty +kitten ipython"
+    elseif $TERM == "xterm-256color"
+        let g:slime_target = "neovim"
+        echo 'g:slime_target = ' . g:slime_target
+    else
+        let g:slime_target = "tmux"
+    endif
+    let g:slime_preserve_curpos = 0
+    let g:slime_python_ipython = 1
+    let g:slime_python_cmd = "python"
+    let g:slime_python_repl = "ipython"
+    fun! StartREPL(repl)
+      execute 'terminal '.a:repl
+      setlocal nonumber
+      let t:term_id = b:terminal_job_id
+      wincmd p
+      execute 'let b:slime_config = {"jobid": "'.t:term_id . '"}'
+    endfun
+    noremap <silent> tt :vsplit<bar>:call StartREPL('ipython')<CR>
+    " vnoremap <leader>r :<C-u>SlimeSendVisual<CR>
+    vnoremap <F5> :<C-u>SlimeSendVisual<CR>
+    " nnoremap <F5> :slime<CR>
+    nnoremap <F5> :SlimeSend<CR>
+elseif has('mac')
+    let g:islime2_29_mode = 1
+    " autocmd FileType python     nnoremap <buffer><leader>rf :%y r<cr>:call islime2#iTermSendNext(@r)<CR>
+    nnoremap <silent> <Leader>il :ISlime2CurrentLine<CR>
+    nnoremap <silent> <Leader>ij :ISlime2NextLine<CR>
+    vnoremap <silent> <Leader>ij :ISlime2NextLine<CR>
+    nnoremap <silent> <Leader>ik :ISlime2PreviousLine<CR>
+    vnoremap <silent> <Leader>ik :ISlime2PreviousLine<CR>
+    nnoremap <silent> <Leader>ii :set opfunc=islime2#iTermSendOperator<CR>
+    vnoremap <silent> <Leader>ii :<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
+    nnoremap <leader>cf :%y r<cr>:call islime2#iTermSendNext(@r)<CR>
+    inoremap <leader>cc <Esc>vip:<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
+    vnoremap <leader>cc :<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
+    nnoremap <leader>cc vip:<C-u>call islime2#iTermSendOperator(visualmode(), 1)<CR>
+    nnoremap <leader>ff :call islime2#iTermRerun()<CR>
+    nnoremap <leader>fp :call islime2#iTermSendUpEnter()<CR>
+    " modify so that different filetype using the same keybind will function
+    " differently. (for both python & R (Nvim-R)
+endif
+    
 " settings for R ----
 " autocmd FileType r     nnoremap <buffer><leader>rs <Plug>:RStart
 " activate shortcut by file type - for Python and R
 " source: https://vi.stackexchange.com/a/10666
+
+" avoid nest nvim
+" source: https://www.reddit.com/r/vim/comments/edrs9q/comment/fbl0e94/?utm_source=share&utm_medium=web2x&context=3
+" command! Unwrap let g:file = expand('%') | bdelete | exec 'silent !echo -e "\033]51;[\"drop\", \"'.g:file.'\"]\007"' | q
 
 " open init.vim in horizontal splitwindow
 nnoremap <Leader>ev :split $MYVIMRC<cr>
@@ -297,24 +436,107 @@ vnoremap <leader>s :sort<CR>
 " mouse
 set mouse=a
 let g:is_mouse_enabled = 1
-noremap <silent> <Leader>m :call ToggleMouse()<CR>
-function ToggleMouse()
-    if g:is_mouse_enabled == 1
-        echo "Mouse OFF"
-        set mouse=
-        let g:is_mouse_enabled = 0
-    else
-        echo "Mouse ON"
-        set mouse=a
-        let g:is_mouse_enabled = 1
-    endif
-endfunction
+
+" chapgpt's answer, does not work
+" Add this line at the top of your init.vim file
+" set termcapkey=F12
+
+" Add this function to check the state of Caps Lock
+" function! CheckCapsLock()
+    " let keycode = getchar()
+    " if keycode == "#8"
+        " echo "Caps Lock is On"
+    " else
+        " echo "Caps Lock is Off"
+    " endif
+" endfunction
+
+
+" function! CheckCapsLock()
+    " if has("capslock")
+        " echo -n "Caps Lock is On"
+    " else
+        " echo -n "Caps Lock is Off"
+    " endif
+" endfunction
+
+
+" Define the shortcut
+" nnoremap <silent> <Leader>\\ :call CheckCapsLock()<CR>
+
+" Define the function to check the status of the Caps Lock key
+" function! CheckCapsLock()
+  " let status = system("xset q | grep Caps | awk '{print $4}'")
+  " if status == "on"
+    " echo "Caps Lock is on"
+  " else
+    " echo "Caps Lock is off"
+  " endif
+" endfunction
+
+
+" Define the command
+" command! CapsLock call CheckCapsLock()
+
+" Define the function to check the status of the Caps Lock key
+" function! CheckCapsLock()
+  " let status = system("xset q | grep Caps | awk '{print $4}'")
+  " if status == "on"
+    " echo "Caps Lock is on"
+  " else
+    " echo "Caps Lock is off"
+  " endif
+" endfunction
+
+" Add this line to call the function when you press the F11 key
+" nnoremap <C-A> :call CheckCapsLock()<CR>a
+" inoremap <C-A> :call CheckCapsLock()<CR>a
+
+" cap lock automatically turns off after learning INSERT mode. Ctrl+A in
+" INSERT mode to toggle caps lock status.
+" source: https://www.reddit.com/r/vim/comments/bzbv98/comment/eqs2lzt/?utm_source=share&utm_medium=web2x&context=3
+" function! Cap_Status()
+    " let St = systemlist('xset -q | grep "Caps Lock" | awk ''{print $4}''')[0]
+    " return St
+" endfunction
+
+" function! Capsoff()
+    " if Cap_Status() == "on"
+        " call system("xdotool key Caps_Lock")
+    " 	redraw
+    " 	highlight Cursor guifg=white guibg=black
+    " endif
+" endfunction
+
+" function! Caps_Toggle()
+    " call system("xdotool key Caps_Lock")
+    " redraw
+    " if Cap_Status() == "on"
+        " echo "CAP ON"
+" 	    highlight Cursor guifg=white guibg=green
+    " else
+        " echo "cap off"
+    " 	highlight Cursor guifg=white guibg=black
+    " endif
+
+" endfunction
+    
+inoremap <c-a> <esc>:call Caps_Toggle()<cr>a
+" autocmd InsertLeave * call Capsoff()
+set laststatus=2
+set statusline=
+set statusline+=\ %f
+set statusline+=%=%{\"CL\ \"\.Cap_Status()}
 
 " color scheme
 syntax on
 colorscheme onedark
 filetype on
-filetype plugin indent on
+
+" neovim terminal colorscheme. source: https://github.com/romgrk/doom-one.vim
+" set it to true if using this neovim terminal colorscheme:
+" souce: 
+" let g:doom_one_terminal_colors = v:true
 
 " lightline
 set noshowmode
@@ -329,8 +551,16 @@ hi LineNrBelow ctermfg=81
 highlight LineNr ctermfg=green
 " highlight certain words: source: https://stackoverflow.com/a/27686668/20031408
 " source: https://stackoverflow.com/a/15288278/20031408
+" use '\c' to match case-insensitively
 hi! mygroup ctermfg=141
 :match mygroup /\<self\>/
+
+" hi! todo_list ctermfg=red cterm=bold
+" :match todo_list /\c\<TODO\>/ 
+" :match todo_list /\(TODO\|todo\)/
+" Add the match for the "todo" and "TODO" texts - highlight entire line
+" autocmd BufEnter * call matchadd("todo_list", ".*\\(TODO\\|todo\\)")
+
 
 " disable audible bell
 set noerrorbells visualbell t_vb=
@@ -476,7 +706,7 @@ set autochdir
 "NREDTREE Keybind and setting
 nnoremap <leader>n :NERDTreeToggle<CR>
 nnoremap <leader>f :NERDTreeFocus<CR>
-nnoremap <leader>d :NERDTree<CR>
+" nnoremap <leader>d :NERDTree<CR>
 
 " map <leader>n :call NERDTreeToggle()<CR>
 " functionNERDTreeToggle()
@@ -496,17 +726,20 @@ function! StartUp()
 endfunction
 autocmd VimEnter * call StartUp()
 
-" Auto-enable NERDTree once open
+" Auto-enable NERDTree once open, and move cursor to file
+" source: https://stackoverflow.com/a/24809018
 autocmd VimEnter * NERDTree
+autocmd VimEnter * wincmd p
 
 " commeting
 " source: https://stackoverflow.com/a/22246318
 autocmd FileType c,cpp,java,scala     let b:comment_leader = '//'
 autocmd FileType sh,ruby,python,r     let b:comment_leader = '#'
-autocmd FileType conf,fstab           let b:comment_leader = '#'
+autocmd FileType conf,fstab,snippets  let b:comment_leader = '#'
 autocmd FileType tex                  let b:comment_leader = '%'
 autocmd FileType mail                 let b:comment_leader = '>'
 autocmd FileType vim                  let b:comment_leader = '"'
+autocmd FileType lua                  let b:comment_leader = '--'
 function! CommentToggle()
     execute ':silent! s/\([^ ]\)/' . escape(b:comment_leader,'\/') . ' \1/'
     execute ':silent! s/^\( *\)' . escape(b:comment_leader,'\/') . ' \?' . escape(b:comment_leader,'\/') . ' \?/\1/'
@@ -519,7 +752,12 @@ map <C-r> <Plug>(ale_previous_wrap)
 
 " tags
 " source: https://stackoverflow.com/a/50136849
-let g:tagbar_ctags_bin = "/usr/local/bin/ctags"
+" source: https://stackoverflow.com/a/52983182
+" let ctag_loc = system('which ctags')
+let ctag_loc = substitute(system('which ctags'), '\n\+$', '','')
+let g:tagbar_ctags_bin = ctag_loc
+" let g:tagbar_ctags_bin = "/usr/bin/ctags"
+" let g:tagbar_ctags_bin = "/usr/local/bin/ctags"
 map <leader>t :TagbarToggle<CR>
 
 " copy, cut and paste
