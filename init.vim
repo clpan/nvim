@@ -73,6 +73,7 @@ Plug 'nvim-telescope/telescope.nvim'
 Plug 'nvim-telescope/telescope-media-files.nvim'
 Plug 'honza/vim-snippets'
 Plug 'rcarriga/nvim-notify'
+Plug 'nvim-treesitter/nvim-treesitter'
 Plug 'kkharji/sqlite.lua'
 Plug 'kode-team/mastodon.nvim'
 Plug 'mfussenegger/nvim-dap'
@@ -557,6 +558,8 @@ set statusline=\PATH:\ %r%F\ \ \ \ \LINE:\ %l/%L/%P\ TIME:\ %{strftime('%c')}
 
 " color scheme
 syntax on
+set termguicolors
+set background=dark
 colorscheme onedark
 filetype on
 
