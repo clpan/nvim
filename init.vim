@@ -57,6 +57,7 @@ Plug 'maxmellon/vim-jsx-pretty'
 Plug 'dccsillag/magma-nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'jpalardy/vim-slime'
 Plug 'matschaffer/vim-islime2'
+Plug 'lukas-reineke/indent-blankline.nvim'
 Plug 'vim-syntastic/syntastic'
 Plug 'nvie/vim-flake8'
 Plug 'davidhalter/jedi-vim'
@@ -71,6 +72,11 @@ Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'nvim-telescope/telescope-media-files.nvim'
 Plug 'honza/vim-snippets'
+Plug 'rcarriga/nvim-notify'
+Plug 'kkharji/sqlite.lua'
+Plug 'kode-team/mastodon.nvim'
+Plug 'mfussenegger/nvim-dap'
+Plug 'rcarriga/nvim-dap-ui'
 " colorscheme
 Plug 'romgrk/doom-one.vim'
 " Plug 'bennypowers/nvim-regexplainer'
@@ -226,14 +232,28 @@ au FileType python let b:AutoPairs = AutoPairsDefine({"f'" : "'", "r'" : "'", "b
   " },
 " }
 
-let g:telescope_preview_options = {
-    \ 'options': {
-        \ 'image_formats': ['png', 'jpg', 'jpeg', 'gif'],
-    \ },
-    \ 'mappings': {
-        \ 'preview': '<CR>',
-        \ },
-    \ }
+
+" let g:telescope_extensions = ['media_files']
+
+" lua <<EOF
+" require('telescope').load_extension('media_files')
+" EOF
+
+" let g:telescope_preview_options = {
+    " \ 'options': {
+        " \ 'image_formats': ['png', 'jpg', 'jpeg', 'gif'],
+    " \ },
+    " \ 'mappings': {
+        " \ 'preview': '<CR>',
+        " \ },
+    " \ }
+" :Telescope media_files
+
+" in init.vim
+
+" luafile $VIMRUNTIME . '/lua/telescope/extensions/media_files.lua'
+" lua require('telescope').extensions.media_files.media_files()
+
 
 " Setup Hologram for image display in neovim
 " source: https://github.com/edluffy/hologram.nvim/issues/17#issuecomment-1314562139
@@ -528,6 +548,13 @@ set statusline=
 set statusline+=\ %f
 set statusline+=%=%{\"CL\ \"\.Cap_Status()}
 
+" set time display on the editor status line
+" source: https://stackoverflow.com/questions/28284276/how-i-can-show-the-time-in-vim-status-bar
+" source: https://vim.fandom.com/wiki/Display_date-and-time_on_status_line
+set ruler
+set rulerformat=%55(%{strftime('%a\ %b\ %e\ %I:%M\ %p')}\ %5l,%-6(%c%V%)\ %P%)
+set statusline=\PATH:\ %r%F\ \ \ \ \LINE:\ %l/%L/%P\ TIME:\ %{strftime('%c')}
+
 " color scheme
 syntax on
 colorscheme onedark
@@ -812,13 +839,51 @@ au BufNewFile, BufRead *.py
     \ set autoindent
     \ set fileformat=unix
 
-" complete & spelling check
+" complete & spelling check. 
+" source: https://jdhao.github.io/2019/04/29/nvim_spell_check/
+" source: https://neovim.io/doc/user/spell.html
+" source: https://vimtricks.com/p/vim-spell-check/
 set complete+=kspell
 set completeopt=menuone,longest
+set spelllang=en,cjk
+set spellsuggest=best,9
+set mousemodel=popup
+:menu PopUp.save :w<CR>
+nnoremap <silent><F11> :set spell!<CR>
+inoremap <silent><F11><C-0> :set spell!<CR>
 
 " set liner to follow flake8,set line length to be 120
 let g:ale_linters = { 'python':['flake8']}
 let g:ale_python_flake8_options = '--max-line-length=120'
+
+" set up debugger
+lua << EOF
+require("dapui").setup()
+EOF
+
+" setup indent blankline
+lua << EOF
+require("indent_blankline").setup {
+    -- for example, context is off by default, use this to turn it on
+    show_current_context = true,
+    show_current_context_start = true,
+}
+EOF
+
+lua << EOF
+vim.opt.list = true
+vim.opt.listchars:append "eol:↴"
+
+require("indent_blankline").setup {
+    show_end_of_line = true,
+}
+EOF
+
+" set up mastodon.nvim
+lua << EOF
+require("mastodon").setup()
+EOF
+
 
 " try to see if can auto turn off caps: - TurnOffCaps() not recognized
 " au InsertLeave * call TurnOffCaps()
