@@ -49,6 +49,7 @@ Plug 'preservim/tagbar'
 Plug 'vim-scripts/indentpython.vim'
 " Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'vim-scripts/AutoComplPop'
+Plug 'tenfyzhong/CompleteParameter.vim'
 Plug 'lepture/vim-jinja'
 Plug 'pangloss/vim-javascript'
 Plug 'alvan/vim-closetag'
@@ -315,6 +316,12 @@ let g:jedi#completion_command = "<C-Space>"
 " let g:pymode_rope = 0
 " let g:jedi#show_call_signatures = 0
 
+" complete parameter setting 
+inoremap <silent><expr> ( complete_parameter#pre_complete("()")
+smap <c-j> <Plug>(complete_parameter#goto_next_parameter)
+imap <c-j> <Plug>(complete_parameter#goto_next_parameter)
+smap <c-k> <Plug>(complete_parameter#goto_previous_parameter)
+imap <c-k> <Plug>(complete_parameter#goto_previous_parameter)
 
 " put parenthesis around highlighted words
 " source: https://superuser.com/questions/875095/adding-parenthesis-around-highlighted-text-in-vim
@@ -362,7 +369,8 @@ endif
 let g:UltiSnipsSnippetDirectories=[$HOME.'/.config/nvim/vim-snippets/UltiSnips']
 let g:UltiSnipsExpandTrigger  = '<Tab>'
 let g:UltiSnipsJumpForwardTrigger = '<Tab>'
-let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
+" let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
+autocmd FileType tex       let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
 " open snippets files with user defined command, type :Texs to open tex.snippets horizontally
 let g:tex_snippets_path = expand("~/.config/nvim/vim-snippets/UltiSnips/tex.snippets")
 command! Texs execute "split" . g:tex_snippets_path
@@ -448,11 +456,11 @@ vnoremap <leader>s :sort<CR>
 
 " indent/unindent with tab/shift-tab
 " source: https://stackoverflow.com/a/46541477/20031408
-" nmap <Tab> >>
-" nmap <S-tab> <<
-" imap <S-Tab> <Esc><<i
-" vmap <Tab> >gv
-" vmap <S-Tab> <gv
+nmap <Tab> >>
+nmap <S-tab> <<
+imap <S-Tab> <Esc><<i
+vmap <Tab> >gv
+vmap <S-Tab> <gv
 
 " mouse
 set mouse=a
@@ -777,8 +785,9 @@ endfunction
 map <leader><Space> :call CommentToggle()<CR>
 
 " ale
-map <C-e> <Plug>(ale_next_wrap)
-map <C-r> <Plug>(ale_previous_wrap)
+" map <C-e> <Plug>(ale_next_wrap)
+" map <C-r> <Plug>(ale_previous_wrap)
+map <C-r> :later
 
 " tags
 " source: https://stackoverflow.com/a/50136849
