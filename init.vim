@@ -462,8 +462,6 @@ vnoremap <S-Tab> <gv
 set mouse=a
 let g:is_mouse_enabled = 1
 
-    
-inoremap <c-a> <esc>:call Caps_Toggle()<cr>a
 set laststatus=2
 set statusline=
 set statusline+=\ %f
@@ -512,9 +510,9 @@ function! SetTermColor()
     else
         hi LineNrAbove ctermfg=190
         hi LineNrBelow ctermfg=81
-        " hi LineNr ctermfg=green ctermbg=25 cterm=bold
         hi LineNr ctermfg=118 ctermbg=25 cterm=bold
         hi CursorLineNr ctermfg=118 ctermbg=25 cterm=bold
+        hi Cursorline guibg=#0f0f0f
         hi! mygroup ctermfg=141
         :match mygroup /\<self\>/
     endif
@@ -536,6 +534,8 @@ function! Toggle_transparent_background()
     let t:is_transparent = 0
   endif
 endfunction
+
+autocmd VimEnter * call Toggle_transparent_background()
 " command! ToggleBg :call Toggle_transparent_background()
  nnoremap<F4> :call Toggle_transparent_background()<CR>
  vnoremap<F4> :call Toggle_transparent_background()<CR>
