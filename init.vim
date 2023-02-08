@@ -186,6 +186,8 @@ set shiftwidth=4
 set softtabstop=4
 set colorcolumn=120
 set expandtab
+set cursorcolumn
+set cursorline
 
 " easy formatting for paragraphs
 " source: https://www.youtube.com/watch?v=YhqsjUUHj6g
@@ -325,9 +327,6 @@ imap <c-k> <Plug>(complete_parameter#goto_previous_parameter)
 
 " put parenthesis around highlighted words
 " source: https://superuser.com/questions/875095/adding-parenthesis-around-highlighted-text-in-vim
-" xnoremap <leader>s xi()<Esc>P
-" try auto-disable cap - unsure if it works - does not work
-" au InsertLeave * call TurnOffCaps()
 
 " setup for latex ====
 " config for vim-tex
@@ -463,96 +462,11 @@ vnoremap <S-Tab> <gv
 set mouse=a
 let g:is_mouse_enabled = 1
 
-" chapgpt's answer, does not work
-" Add this line at the top of your init.vim file
-" set termcapkey=F12
-
-" Add this function to check the state of Caps Lock
-" function! CheckCapsLock()
-    " let keycode = getchar()
-    " if keycode == "#8"
-        " echo "Caps Lock is On"
-    " else
-        " echo "Caps Lock is Off"
-    " endif
-" endfunction
-
-
-" function! CheckCapsLock()
-    " if has("capslock")
-        " echo -n "Caps Lock is On"
-    " else
-        " echo -n "Caps Lock is Off"
-    " endif
-" endfunction
-
-
-" Define the shortcut
-" nnoremap <silent> <Leader>\\ :call CheckCapsLock()<CR>
-
-" Define the function to check the status of the Caps Lock key
-" function! CheckCapsLock()
-  " let status = system("xset q | grep Caps | awk '{print $4}'")
-  " if status == "on"
-    " echo "Caps Lock is on"
-  " else
-    " echo "Caps Lock is off"
-  " endif
-" endfunction
-
-
-" Define the command
-" command! CapsLock call CheckCapsLock()
-
-" Define the function to check the status of the Caps Lock key
-" function! CheckCapsLock()
-  " let status = system("xset q | grep Caps | awk '{print $4}'")
-  " if status == "on"
-    " echo "Caps Lock is on"
-  " else
-    " echo "Caps Lock is off"
-  " endif
-" endfunction
-
-" Add this line to call the function when you press the F11 key
-" nnoremap <C-A> :call CheckCapsLock()<CR>a
-" inoremap <C-A> :call CheckCapsLock()<CR>a
-
-" cap lock automatically turns off after learning INSERT mode. Ctrl+A in
-" INSERT mode to toggle caps lock status.
-" source: https://www.reddit.com/r/vim/comments/bzbv98/comment/eqs2lzt/?utm_source=share&utm_medium=web2x&context=3
-" function! Cap_Status()
-    " let St = systemlist('xset -q | grep "Caps Lock" | awk ''{print $4}''')[0]
-    " return St
-" endfunction
-
-" function! Capsoff()
-    " if Cap_Status() == "on"
-        " call system("xdotool key Caps_Lock")
-    " 	redraw
-    " 	highlight Cursor guifg=white guibg=black
-    " endif
-" endfunction
-
-" function! Caps_Toggle()
-    " call system("xdotool key Caps_Lock")
-    " redraw
-    " if Cap_Status() == "on"
-        " echo "CAP ON"
-" 	    highlight Cursor guifg=white guibg=green
-    " else
-        " echo "cap off"
-    " 	highlight Cursor guifg=white guibg=black
-    " endif
-
-" endfunction
     
 inoremap <c-a> <esc>:call Caps_Toggle()<cr>a
-" autocmd InsertLeave * call Capsoff()
 set laststatus=2
 set statusline=
 set statusline+=\ %f
-set statusline+=%=%{\"CL\ \"\.Cap_Status()}
 
 " set time display on the editor status line
 " source: https://stackoverflow.com/questions/28284276/how-i-can-show-the-time-in-vim-status-bar
@@ -563,7 +477,7 @@ set statusline=\PATH:\ %r%F\ \ \ \ \LINE:\ %l/%L/%P\ TIME:\ %{strftime('%c')}
 
 " color scheme
 syntax on
-" set termguicolors=0
+" set termguicolors
 set background=dark
 colorscheme onedark
 filetype on
@@ -578,13 +492,10 @@ set noshowmode
 let g:lightline = { 'colorscheme': 'onedark' }
 
 " highlighting, must be placed after colorscheme
+" highlight certain words: source: https://stackoverflow.com/a/27686668/20031408
+" source: https://stackoverflow.com/a/15288278/20031408
 " source: https://stackoverflow.com/a/237293/20031408
 " color schema: https://vim.fandom.com/wiki/Xterm256_color_names_for_console_Vim
-" highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE gui=NONE guifg=DarkGrey guibg=NONE
-" hi LineNrAbove ctermfg=190
-" hi LineNrBelow ctermfg=81
-" highlight LineNr ctermfg=green
-
 " source: https://www.reddit.com/r/vim/comments/l9or1w/comment/gljots6/?utm_source=share&utm_medium=web2x&context=3
 " source: https://stackoverflow.com/a/5296709
 " function written by chatgpt
@@ -601,23 +512,33 @@ function! SetTermColor()
     else
         hi LineNrAbove ctermfg=190
         hi LineNrBelow ctermfg=81
-        hi LineNr ctermfg=green
+        " hi LineNr ctermfg=green ctermbg=25 cterm=bold
+        hi LineNr ctermfg=118 ctermbg=25 cterm=bold
+        hi CursorLineNr ctermfg=118 ctermbg=25 cterm=bold
         hi! mygroup ctermfg=141
         :match mygroup /\<self\>/
     endif
 endfunction
-
 call SetTermColor()
-" highlight certain words: source: https://stackoverflow.com/a/27686668/20031408
-" source: https://stackoverflow.com/a/15288278/20031408
-" use '\c' to match case-insensitively
 
-" hi! todo_list ctermfg=red cterm=bold
-" :match todo_list /\c\<TODO\>/ 
-" :match todo_list /\(TODO\|todo\)/
-" Add the match for the "todo" and "TODO" texts - highlight entire line
-" autocmd BufEnter * call matchadd("todo_list", ".*\\(TODO\\|todo\\)")
-
+" source: https://vi.stackexchange.com/a/31912
+" source: more transparency setting: https://www.reddit.com/r/neovim/comments/ncv6oj/comment/gy77nhx/?utm_source=share&utm_medium=web2x&context=3
+let t:is_transparent = 0
+function! Toggle_transparent_background()
+  if t:is_transparent == 0
+    hi Normal guibg=none ctermbg=none
+    let t:is_transparent = 1
+  else
+    " hi Normal guibg=NONE ctermbg=NONE
+    hi Normal guibg=NONE
+    set background=dark
+    call SetTermColor()
+    let t:is_transparent = 0
+  endif
+endfunction
+" command! ToggleBg :call Toggle_transparent_background()
+ nnoremap<F4> :call Toggle_transparent_background()<CR>
+ vnoremap<F4> :call Toggle_transparent_background()<CR>
 
 " disable audible bell
 set noerrorbells visualbell t_vb=
@@ -625,7 +546,7 @@ set noerrorbells visualbell t_vb=
 " shows what key that just been typed out
 set showcmd
 " give more space for displaying messages.
-set cmdheight=2
+set cmdheight=1
 
 " By default, Vim doesn't let you hide a buffer (i.e. have a buffer that isn't
 " shown in any window) that has unsaved changes. This is to prevent you from "
@@ -931,7 +852,3 @@ EOF
 lua << EOF
 require("mastodon").setup()
 EOF
-
-
-" try to see if can auto turn off caps: - TurnOffCaps() not recognized
-" au InsertLeave * call TurnOffCaps()
