@@ -385,10 +385,7 @@ if has('linux')
     " let g:slime_target = "neovim"
     if $TERM == "xterm-kitty"
         let g:slime_target = "kitty"
-        " echo 'g:slime_target = ' . g:slime_target
-        " :echom 'g:slime_target = ' . g:slime_target
         let g:slime_kitty_socket = system("echo $KITTY_LISTEN_ON")
-        " let g:slime_kitty_socket = "unix:/tmp/mykitty-3275"
         let g:slime_cmd = "kitty +kitten ipython"
     elseif $TERM == "xterm-256color"
         let g:slime_target = "neovim"
@@ -408,10 +405,10 @@ if has('linux')
       execute 'let b:slime_config = {"jobid": "'.t:term_id . '"}'
     endfun
     noremap <silent> tt :vsplit<bar>:call StartREPL('ipython')<CR>
-    " vnoremap <leader>r :<C-u>SlimeSendVisual<CR>
-    vnoremap <F5> :<C-u>SlimeSendVisual<CR>
-    " nnoremap <F5> :slime<CR>
+    " vnoremap <F5> :<C-u>SlimeSendVisual<CR>
+    vnoremap <F5> :SlimeSend<CR>
     nnoremap <F5> :SlimeSend<CR>
+    nnoremap <C-c><C-c><CR> <C-c><C-c>}j
 elseif has('mac')
     let g:islime2_29_mode = 1
     " autocmd FileType python     nnoremap <buffer><leader>rf :%y r<cr>:call islime2#iTermSendNext(@r)<CR>
@@ -456,11 +453,11 @@ vnoremap <leader>s :sort<CR>
 
 " indent/unindent with tab/shift-tab
 " source: https://stackoverflow.com/a/46541477/20031408
-nmap <Tab> >>
-nmap <S-tab> <<
+nnoremap <Tab> >>
+nnoremap <S-tab> <<
 imap <S-Tab> <Esc><<i
-vmap <Tab> >gv
-vmap <S-Tab> <gv
+vnoremap <Tab> >gv
+vnoremap <S-Tab> <gv
 
 " mouse
 set mouse=a
@@ -566,7 +563,7 @@ set statusline=\PATH:\ %r%F\ \ \ \ \LINE:\ %l/%L/%P\ TIME:\ %{strftime('%c')}
 
 " color scheme
 syntax on
-set termguicolors
+" set termguicolors=0
 set background=dark
 colorscheme onedark
 filetype on
@@ -584,14 +581,36 @@ let g:lightline = { 'colorscheme': 'onedark' }
 " source: https://stackoverflow.com/a/237293/20031408
 " color schema: https://vim.fandom.com/wiki/Xterm256_color_names_for_console_Vim
 " highlight LineNr term=bold cterm=NONE ctermfg=DarkGrey ctermbg=NONE gui=NONE guifg=DarkGrey guibg=NONE
-hi LineNrAbove ctermfg=190
-hi LineNrBelow ctermfg=81
-highlight LineNr ctermfg=green
+" hi LineNrAbove ctermfg=190
+" hi LineNrBelow ctermfg=81
+" highlight LineNr ctermfg=green
+
+" source: https://www.reddit.com/r/vim/comments/l9or1w/comment/gljots6/?utm_source=share&utm_medium=web2x&context=3
+" source: https://stackoverflow.com/a/5296709
+" function written by chatgpt
+function! SetTermColor()
+    if &termguicolors == 1
+        echo "background is dark"
+        let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+        let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+        hi LineNrAbove guifg=yellow
+        hi LineNrBelow guifg=blue
+        hi LineNr guifg=green
+        hi mygroup guifg=purple
+        :match mygroup /\<self\>/
+    else
+        hi LineNrAbove ctermfg=190
+        hi LineNrBelow ctermfg=81
+        hi LineNr ctermfg=green
+        hi! mygroup ctermfg=141
+        :match mygroup /\<self\>/
+    endif
+endfunction
+
+call SetTermColor()
 " highlight certain words: source: https://stackoverflow.com/a/27686668/20031408
 " source: https://stackoverflow.com/a/15288278/20031408
 " use '\c' to match case-insensitively
-hi! mygroup ctermfg=141
-:match mygroup /\<self\>/
 
 " hi! todo_list ctermfg=red cterm=bold
 " :match todo_list /\c\<TODO\>/ 
@@ -744,7 +763,15 @@ set autochdir
 "NREDTREE Keybind and setting
 nnoremap <leader>n :NERDTreeToggle<CR>
 nnoremap <leader>f :NERDTreeFocus<CR>
+nnoremap <leader>ff :NERDTreeFind<CR>
 " nnoremap <leader>d :NERDTree<CR>
+"" Check if NERDTree is open or active
+function! IsNERDTreeOpen()        
+  return exists("t:NERDTreeBufName") && (bufwinnr(t:NERDTreeBufName) != -1)
+endfunction
+
+" Call NERDTreeFind iff NERDTree is active, current window contains a modifiable
+" file, and we're not in vimdiff: source: https://stackoverflow.com/a/42154947
 
 " map <leader>n :call NERDTreeToggle()<CR>
 " functionNERDTreeToggle()
@@ -787,7 +814,7 @@ map <leader><Space> :call CommentToggle()<CR>
 " ale
 " map <C-e> <Plug>(ale_next_wrap)
 " map <C-r> <Plug>(ale_previous_wrap)
-map <C-r> :later
+map <C-r> :later<CR>
 
 " tags
 " source: https://stackoverflow.com/a/50136849
@@ -843,7 +870,7 @@ inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
 
 " set indent for .py file
 au BufNewFile, BufRead *.py
-    \ set tabstop=4
+    \ set tabstop=8
     \ set softtabstop=4
     \ set shiftswidth=4
     \ set textwidth=79
@@ -868,12 +895,21 @@ inoremap <silent><F11><C-0> :set spell!<CR>
 let g:ale_linters = { 'python':['flake8']}
 let g:ale_python_flake8_options = '--max-line-length=120'
 
-" set up debugger
+" set up debugger 
 lua << EOF
 require("dapui").setup()
 EOF
 
-" setup indent blankline
+" setup notification "
+lua << EOF
+require("notify").setup{
+    timeout=4000,
+    render='mininal',
+    stages='static',
+}
+EOF
+
+" setup indent blankline "
 lua << EOF
 require("indent_blankline").setup {
     -- for example, context is off by default, use this to turn it on
@@ -891,7 +927,7 @@ require("indent_blankline").setup {
 }
 EOF
 
-" set up mastodon.nvim
+" set up mastodon.nvim "
 lua << EOF
 require("mastodon").setup()
 EOF
