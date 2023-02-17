@@ -58,6 +58,9 @@ Plug 'maxmellon/vim-jsx-pretty'
 Plug 'dccsillag/magma-nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'jpalardy/vim-slime'
 Plug 'matschaffer/vim-islime2'
+" Plug 'klafyvel/vim-slime-cells'
+Plug 'knubie/vim-kitty-navigator', {'do': 'cp ./*.py ~/.config/kitty/'}
+" Plug 'akinsho/toggleterm.nvim', {'tag' : '*'}
 Plug 'lukas-reineke/indent-blankline.nvim'
 Plug 'vim-syntastic/syntastic'
 Plug 'nvie/vim-flake8'
@@ -67,7 +70,6 @@ Plug 'lervag/vimtex'
 Plug 'xuhdev/vim-latex-live-preview'
 Plug 'SirVer/ultisnips'
 Plug 'edluffy/hologram.nvim', {'auto_display': 'true'}
-" Plug 'edluffy/hologram.nvim'
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
@@ -107,9 +109,6 @@ set exrc
 " set shell to iterm2 to plot matplotlib figures
 " set shell=/Applications/iTerm.app/Contents/MacOS/iTerm2
 " set shell=iTerm.app
-
-" always show the status bar
-set laststatus=2
 
 " show whitespace. Must be inserted before colorscheme command
 
@@ -407,7 +406,12 @@ if has('linux')
     " vnoremap <F5> :<C-u>SlimeSendVisual<CR>
     vnoremap <F5> :SlimeSend<CR>
     nnoremap <F5> :SlimeSend<CR>
-    nnoremap <C-c><C-c><CR> <C-c><C-c>}j
+    " nmap<C-c>v <Plug>SlimeConfig
+    " vim-slime-cells
+    " nmap <F6> <Plug>SlimeCellsSendAndGoToNext
+    " nmap <c-c><c-Down> <Plug>SlimeCellsNext
+    " nmap <c-c><c-Up> <Plug>SlimeCellsPrev
+    " nnoremap <C-c><C-c><CR> <C-c><C-c>}j
 elseif has('mac')
     let g:islime2_29_mode = 1
     " autocmd FileType python     nnoremap <buffer><leader>rf :%y r<cr>:call islime2#iTermSendNext(@r)<CR>
@@ -462,6 +466,7 @@ vnoremap <S-Tab> <gv
 set mouse=a
 let g:is_mouse_enabled = 1
 
+" always show the status bar
 set laststatus=2
 set statusline=
 set statusline+=\ %f
@@ -649,6 +654,11 @@ elseif has('linux')
     nnoremap <A-j> :wincmd j<CR>
     nnoremap <A-h> :wincmd h<CR>
     nnoremap <A-l> :wincmd l<CR>
+    let g:kitty_navigator_no_mappings = 1
+    nnoremap <silent> <A-h> :KittyNavigateLeft<cr>
+    nnoremap <silent> <A-j> :KittyNavigateDown<cr>
+    nnoremap <silent> <A-k> :KittyNavigateUp<cr>
+    nnoremap <silent> <A-l> :KittyNavigateRight<cr>
 endif
 " move through buffers
 " nmap <leader>[ :bp!<CR>
