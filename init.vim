@@ -43,6 +43,7 @@ Plug 'preservim/nerdtree'
 Plug 'jistr/vim-nerdtree-tabs'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'jiangmiao/auto-pairs'
+Plug 'gosukiwi/vim-smartpairs'
 Plug 'tpope/vim-surround'
 Plug 'dense-analysis/ale'
 Plug 'preservim/tagbar'
@@ -80,6 +81,7 @@ Plug 'nvim-treesitter/nvim-treesitter'
 Plug 'kkharji/sqlite.lua'
 Plug 'kode-team/mastodon.nvim'
 Plug 'mfussenegger/nvim-dap'
+Plug 'puremourning/vimspector'
 Plug 'rcarriga/nvim-dap-ui'
 " colorscheme
 Plug 'romgrk/doom-one.vim'
@@ -156,11 +158,23 @@ set t_Co=256
 set shortmess+=I
 
 " turn on line numbering
+" source https://jeffkreeftmeijer.com/vim-number/
+" source https://stackoverflow.com/a/15958387
 set number
 set number relativenumber
+:augroup numbertoggle
+:  autocmd!
+:  autocmd BufEnter,FocusGained,InsertLeave,WinEnter * if &nu && mode() != "i" | set rnu   | endif
+:  autocmd BufLeave,FocusLost,WinLeave   * if &nu                  | set nornu | endif
+:augroup END
 
 " Enable searching as you type
 set incsearch
+
+" replace selected block - C-r to activate
+" source: https://stackoverflow.com/a/676619
+":'<,'>s/red/green/g, or use 'gc' to confirm before replace
+vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left>
 
 " turn off search highlighting. source: https://stackoverflow.com/a/25569434
 " set nohlsearch    " this permanently disable highlighing when searching
@@ -187,6 +201,8 @@ set colorcolumn=120
 set expandtab
 set cursorcolumn
 set cursorline
+" set showmatch
+" set matchtime=10
 
 " easy formatting for paragraphs
 " source: https://www.youtube.com/watch?v=YhqsjUUHj6g
@@ -220,7 +236,7 @@ autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2
 nmap Q <Nop>
 
 " auto-pairs
-au FileType python let b:AutoPairs = AutoPairsDefine({"f'" : "'", "r'" : "'", "b'" : "'"})
+" au FileType python let b:AutoPairs = AutoPairsDefine({"f'" : "'", "r'" : "'", "b'" : "'"})
 
 " setup telescope to view images
 " require('telescope').load_extension('media_files')
@@ -613,6 +629,14 @@ nnoremap <silent>       <LocalLeader>ro :MagmaShowOutput<CR>
 let g:magma_automatically_open_output = v:false
 " let g:magma_image_provider = "ueberzug"
 
+let g:vimspector_enable_mappings = "HUMAN"
+nnoremap <leader>dd :call vimspector#Launch()<CR>
+nnoremap <leader>dd :VimspectReset<CR>
+nnoremap <leader>de :VimspectorEval
+nnoremap <leader>dw :VimspectorWatch
+nnoremap <leader>do :VimspectorSHowOutput
+
+
 function ToggleWrap()
     if &wrap
         echo "Wrap OFF"
@@ -732,6 +756,7 @@ autocmd VimEnter * wincmd p
 autocmd FileType c,cpp,java,scala     let b:comment_leader = '//'
 autocmd FileType sh,ruby,python,r     let b:comment_leader = '#'
 autocmd FileType conf,fstab,snippets  let b:comment_leader = '#'
+autocmd FileType yaml                 let b:comment_leader = '#'
 autocmd FileType tex                  let b:comment_leader = '%'
 autocmd FileType mail                 let b:comment_leader = '>'
 autocmd FileType vim                  let b:comment_leader = '"'
