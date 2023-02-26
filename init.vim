@@ -187,6 +187,85 @@ vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 " captalize/lowercase first character of each words in one line
 " souce: https://stackoverflow.com/questions/17440659/capitalize-first-letter-of-each-word-in-a-selection-using-vim
 vnoremap <leader>u :s/\<./\U&/g<CR>:noh<CR>
+" place everything selected under [  ]
+vnoremap <silent> <leader>[ :s/\%V\(\w.*\)/[\1]/<CR>
+vnoremap <silent> <leader>( :s/\%V\(\w.*\)/(\1)/<CR>
+vnoremap <silent> <leader>' :s/\%V\(\w.*\)/'\1'/<CR>
+vnoremap <silent> <leader>" :s/\%V\(\w.*\)/"\1"/<CR>
+vnoremap <silent> <leader>{ :s/\%V\(\w.*\)/{\1}/<CR>
+
+" highlight whatever visually selected til end
+vnoremap <silent> <leader>se :s/\%V\(\w.*\)
+" select only one word
+vnoremap <silent> <leader>sw :s/\%V\(\w\+\)
+
+
+" Define a function to wrap selected text with user-inputted characters
+function! WrapSurronding()
+  " Save the current register contents
+  let register_save = @@
+  " Save the visual selection to the register
+  normal! gv"xy
+ " Get user input for the wrapper characters
+  let wrapper = input("Enter wrapper characters (separated by a space): ")
+  " Split the wrapper input into left and right parts
+  let [left_wrapper, right_wrapper] = split(wrapper)
+  " Replace the selected text with the wrapped text
+  execute "'<,'>s/\\V" . escape(@x, '/\') . "/".left_wrapper."\\0".right_wrapper."/g"
+  " Restore the previous register contents
+  " let @@ = register_save
+endfunction
+" Create a keybinding for the WrapSelectedText function
+vnoremap <leader>wp :<c-u>call WrapSurronding()<cr>
+
+function! SetCursorPos(line, col)
+  let pos = [0, a:line, a:col, 0]
+  call setpos('.', pos)
+endfunction
+
+function! DeleteCharAtPosition(line_num, col_num)
+  let line_content = getline(a:line_num)
+  let new_content = strpart(line_content, 0, a:col_num - 1) . strpart(line_content, a:col_num)
+  call setline(a:line_num, new_content)
+endfunction
+
+function! RemoveSurrounding()
+  " Enter visual mode to select text
+  normal! gv
+  " Copy selected text to register 'a'
+  normal! "ay
+  " Assign selected text to variable 'selected_text'
+  let selected_text = @a
+  let start_line = getpos("'<")[1]
+  let start_col = getpos("'<")[2]
+  let end_line = getpos("'>")[1]
+  let end_col = getpos("'>")[2]
+  call DeleteCharAtPosition(start_line, start_col - 1)
+  call DeleteCharAtPosition(end_line, end_col)
+  echo "selected_text: " . selected_text
+endfunction
+vnoremap <leader>mw :call RemoveSurrounding()<CR><CR>
+
+function! ReplaceSurronding()
+  normal! gv
+  normal! "ay
+  let selected_text = @a
+  let start_line = getpos("'<")[1]
+  let start_col = getpos("'<")[2]
+  let end_line = getpos("'>")[1]
+  let end_col = getpos("'>")[2]
+  let cursor_line = getpos('.')[1]
+  let cursor_col = getpos('.')[2]
+  call DeleteCharAtPosition(start_line, start_col - 1)
+  call DeleteCharAtPosition(end_line, end_col)
+  echo "selected_text: " . selected_text
+  let wrapper = input("Enter wrapper characters (separated by a space): ")
+  let [left_wrapper, right_wrapper] = split(wrapper)
+  execute "'<,'>s/\\V" . escape(@x, '/\') . "/".left_wrapper."\\0".right_wrapper."/g"
+  call SetCursorPos(cursor_line, cursor_col)
+endfunction
+
+vnoremap <leader>b :call ReplaceSurronding()<CR><CR>
 
 " sane text files
 set fileformat=unix
