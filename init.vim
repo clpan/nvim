@@ -499,14 +499,12 @@ if has('linux')
     endfun
     noremap <silent> tt :vsplit<bar>:call StartREPL('ipython')<CR>
     " vnoremap <F5> :<C-u>SlimeSendVisual<CR>
-    vnoremap <F5> :SlimeSend<CR>
-    nnoremap <F5> :SlimeSend<CR>
-    " nmap<C-c>v <Plug>SlimeConfig
-    " vim-slime-cells
-    " nmap <F6> <Plug>SlimeCellsSendAndGoToNext
-    " nmap <c-c><c-Down> <Plug>SlimeCellsNext
-    " nmap <c-c><c-Up> <Plug>SlimeCellsPrev
-    " nnoremap <C-c><C-c><CR> <C-c><C-c>}j
+    " vnoremap <F5> :SlimeSend<CR>
+    " nnoremap <F5> :SlimeSend<CR>
+    vnoremap <C-CR> :SlimeSend<CR>
+    nnoremap <C-CR> :SlimeSend<CR>
+    vnoremap <silent> <C-A-CR> :<C-u>silent execute("'<,'>SlimeSend") \| let lnum=line("'>") \| execute("silent normal! " . (lnum+1) . "G")<CR>
+    nnoremap <C-A-CR> :SlimeSend<CR>j
 elseif has('mac')
     let g:islime2_29_mode = 1
     " autocmd FileType python     nnoremap <buffer><leader>rf :%y r<cr>:call islime2#iTermSendNext(@r)<CR>
@@ -637,8 +635,8 @@ endfunction
 
 autocmd VimEnter * call Toggle_transparent_background()
 " command! ToggleBg :call Toggle_transparent_background()
- nnoremap<F4> :call Toggle_transparent_background()<CR>
- vnoremap<F4> :call Toggle_transparent_background()<CR>
+ nnoremap <silent> <F4> :call Toggle_transparent_background()<CR>
+ vnoremap <silent> <F4> :call Toggle_transparent_background()<CR>
 
 " disable audible bell
 set noerrorbells visualbell t_vb=
@@ -836,6 +834,7 @@ autocmd FileType c,cpp,java,scala     let b:comment_leader = '//'
 autocmd FileType sh,ruby,python,r     let b:comment_leader = '#'
 autocmd FileType conf,fstab,snippets  let b:comment_leader = '#'
 autocmd FileType yaml                 let b:comment_leader = '#'
+autocmd FileType desktop              let b:comment_leader = '#'
 autocmd FileType tex                  let b:comment_leader = '%'
 autocmd FileType mail                 let b:comment_leader = '>'
 autocmd FileType vim                  let b:comment_leader = '"'
@@ -844,7 +843,7 @@ function! CommentToggle()
     execute ':silent! s/\([^ ]\)/' . escape(b:comment_leader,'\/') . ' \1/'
     execute ':silent! s/^\( *\)' . escape(b:comment_leader,'\/') . ' \?' . escape(b:comment_leader,'\/') . ' \?/\1/'
 endfunction
-map <leader><Space> :call CommentToggle()<CR>
+map <silent> <leader><Space> :call CommentToggle()<CR>
 
 " ale
 " map <C-e> <Plug>(ale_next_wrap)
