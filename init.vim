@@ -164,8 +164,10 @@ set number
 set number relativenumber
 :augroup numbertoggle
 :  autocmd!
-:  autocmd BufEnter,FocusGained,InsertLeave,WinEnter * if &nu && mode() != "i" | set rnu   | endif
-:  autocmd BufLeave,FocusLost,WinLeave   * if &nu                  | set nornu | endif
+:  autocmd BufEnter,FocusGained,InsertLeave,WinEnter * if &nu && mode() != "i" | set rnu | hi LineNr cterm=NONE | endif
+" :  autocmd BufLeave,FocusLost,WinLeave   * if &nu                  | set nornu | endif
+" :  autocmd BufLeave,FocusLost,WinLeave   * if &nu                  | set nornu | hi LineNrAbove ctermfg=190 | hi LineNrBelow ctermfg=81 | hi LineNr ctermfg=NONE ctermbg=NONE cterm=NONE | hi CursorLineNr ctermfg=118 ctermbg=NONE cterm=NONE | endif
+:  autocmd BufLeave,FocusLost,WinLeave   * if &nu                  | set nornu | hi LineNr ctermfg=NONE ctermbg=NONE cterm=NONE | hi CursorLineNr ctermbg=NONE cterm=NONE | endif
 :augroup END
 
 " Enable searching as you type
@@ -216,7 +218,7 @@ function! WrapSurronding()
   " let @@ = register_save
 endfunction
 " Create a keybinding for the WrapSelectedText function
-vnoremap <leader>wp :<c-u>call WrapSurronding()<cr>
+vnoremap <leader>ap :<c-u>call WrapSurronding()<cr>
 
 function! SetCursorPos(line, col)
   let pos = [0, a:line, a:col, 0]
@@ -497,11 +499,7 @@ if has('linux')
       wincmd p
       execute 'let b:slime_config = {"jobid": "'.t:term_id . '"}'
     endfun
-    noremap <silent> tt :vsplit<bar>:call StartREPL('ipython')<CR>
-    " vnoremap <F5> :<C-u>SlimeSendVisual<CR>
-    " vnoremap <F5> :SlimeSend<CR>
-    " nnoremap <F5> :SlimeSend<CR>
-    vnoremap <C-CR> :SlimeSend<CR>
+    vnoremap <C-CR> <Plug>SlimeRegionSend
     nnoremap <C-CR> :SlimeSend<CR>
     vnoremap <silent> <C-A-CR> :<C-u>silent execute("'<,'>SlimeSend") \| let lnum=line("'>") \| execute("silent normal! " . (lnum+1) . "G")<CR>
     nnoremap <C-A-CR> :SlimeSend<CR>j
@@ -608,8 +606,10 @@ function! SetTermColor()
     else
         hi LineNrAbove ctermfg=190
         hi LineNrBelow ctermfg=81
-        hi LineNr ctermfg=118 ctermbg=25 cterm=bold
-        hi CursorLineNr ctermfg=118 ctermbg=25 cterm=bold
+        " hi LineNr ctermfg=118 ctermbg=25 cterm=bold
+        hi LineNr ctermfg=118 ctermbg=25
+        " hi CursorLineNr ctermfg=118 ctermbg=25 cterm=bold
+        hi CursorLineNr ctermfg=118 cterm=bold
         hi Cursorline guibg=#0f0f0f
         hi! mygroup ctermfg=141
         :match mygroup /\<self\>/
