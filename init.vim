@@ -83,8 +83,10 @@ Plug 'kode-team/mastodon.nvim'
 Plug 'mfussenegger/nvim-dap'
 Plug 'puremourning/vimspector'
 Plug 'rcarriga/nvim-dap-ui'
+Plug 'neovim/nvim-lspconfig'
 " colorscheme
 Plug 'romgrk/doom-one.vim'
+Plug 'github/copilot.vim'
 " Plug 'bennypowers/nvim-regexplainer'
 " Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
         " PLug ''
@@ -278,7 +280,7 @@ set fileencoding=utf-8
 set tabstop=4
 set shiftwidth=4
 set softtabstop=4
-set colorcolumn=120
+set colorcolumn=80
 set expandtab
 set cursorcolumn
 set cursorline
@@ -492,6 +494,8 @@ if has('linux')
     let g:slime_python_ipython = 1
     let g:slime_python_cmd = "python"
     let g:slime_python_repl = "ipython"
+    let g:slime_r_runner = "R"
+    let g:slime_r_source_cmd = 'source(%filename%)'
     fun! StartREPL(repl)
       execute 'terminal '.a:repl
       setlocal nonumber
@@ -501,8 +505,9 @@ if has('linux')
     endfun
     vnoremap <C-CR> <Plug>SlimeRegionSend
     nnoremap <C-CR> :SlimeSend<CR>
-    vnoremap <silent> <C-A-CR> :<C-u>silent execute("'<,'>SlimeSend") \| let lnum=line("'>") \| execute("silent normal! " . (lnum+1) . "G")<CR>
-    nnoremap <C-A-CR> :SlimeSend<CR>j
+    " vnoremap <silent> <C-A-CR> :<C-u>silent execute("'<,'>SlimeSend") \| let lnum=line("'>") \| execute("silent normal! " . (lnum+1) . "G")<CR>
+    vnoremap <silent> <C-A-CR> :<C-u>silent execute("normal! \<Plug>SlimeRegionSend") \| let lnum=line("'>") \| execute("silent normal! " . (lnum+1) . "G")<CR>
+    nnoremap <silent> <C-A-CR> :SlimeSend<CR>j
 elseif has('mac')
     let g:islime2_29_mode = 1
     " autocmd FileType python     nnoremap <buffer><leader>rf :%y r<cr>:call islime2#iTermSendNext(@r)<CR>
@@ -527,6 +532,49 @@ endif
 " autocmd FileType r     nnoremap <buffer><leader>rs <Plug>:RStart
 " activate shortcut by file type - for Python and R
 " source: https://vi.stackexchange.com/a/10666
+
+autocmd BufNewFile,BufRead *.r set filetype=r
+
+" config for Nvim-R
+
+let g:R_disable_warnings = 1
+let g:R_auto_start_session = 1
+let g:R_echo_messages = 0
+let g:R_repl_send_line_when_complete = 1
+let g:R_repl_send_on_enter = 0
+let g:R_repl_send_on_motion = 0
+
+
+" Configure R language server
+au FileType r,nz setlocal omnifunc=lsp#complete
+au FileType r,nz nnoremap <buffer> <silent> K :LspHover<CR>
+au FileType r,nz nnoremap <buffer> <silent> <C-]> :LspDefinition<CR>
+au FileType r,nz nnoremap <buffer> <silent> <leader>rn :LspRename<CR>
+
+" Configure the R language server executable
+let g:lsp_r_language_server_executable = 'R'
+" let g:lsp_r_language_server_args = csplit(&shellcmdflag, ' ') + ['--slave', '-e', 'languageserver::run()']
+let g:lsp_r_language_server_args = split(&shellcmdflag) + ['--slave', '-e', 'languageserver::run()']
+let g:lsp_r_language_server_stdin = v:true
+
+
+let g:LanguageClient_serverCommands = {
+    \ 'r': ['R', '--slave', '-e', 'languageserver::run()'],
+    \ }
+
+
+let g:LanguageServer_stdio = 1
+
+function! SetupRls()
+    let server_cmd = ["julia", "-e", "using LanguageServer; server = LanguageServer.LanguageServerInstance(stdin, stdout, false); run(server);"]
+    let options = {
+        \ 'cmd': server_cmd,
+        \ 'filetypes': ['r'],
+        \ }
+    call language_client#start('r', options)
+endfunction
+
+autocmd FileType r call SetupRls()
 
 " avoid nest nvim
 " source: https://www.reddit.com/r/vim/comments/edrs9q/comment/fbl0e94/?utm_source=share&utm_medium=web2x&context=3
@@ -927,7 +975,7 @@ inoremap <silent><F11><C-0> :set spell!<CR>
 
 " set liner to follow flake8,set line length to be 120
 let g:ale_linters = { 'python':['flake8']}
-let g:ale_python_flake8_options = '--max-line-length=120'
+let g:ale_python_flake8_options = '--max-line-length=80'
 
 " set up debugger 
 lua << EOF
