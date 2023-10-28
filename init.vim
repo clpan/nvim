@@ -977,7 +977,7 @@ inoremap <silent><F11><C-0> :set spell!<CR>
 let g:ale_linters = { 'python':['flake8']}
 let g:ale_python_flake8_options = '--max-line-length=80'
 
-" set up debugger 
+" setup up debugger "
 lua << EOF
 require("dapui").setup()
 EOF
