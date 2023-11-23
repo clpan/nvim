@@ -879,6 +879,7 @@ autocmd VimEnter * wincmd p
 " commeting
 " source: https://stackoverflow.com/a/22246318
 autocmd FileType c,cpp,java,scala     let b:comment_leader = '//'
+autocmd FileType javascript           let b:comment_leader = '//'
 autocmd FileType sh,ruby,python,r     let b:comment_leader = '#'
 autocmd FileType conf,fstab,snippets  let b:comment_leader = '#'
 autocmd FileType yaml                 let b:comment_leader = '#'
@@ -976,6 +977,11 @@ inoremap <silent><F11><C-0> :set spell!<CR>
 " set liner to follow flake8,set line length to be 120
 let g:ale_linters = { 'python':['flake8']}
 let g:ale_python_flake8_options = '--max-line-length=80'
+" set linting for javascript with eslint_d
+let g:ale_javascript_eslint_executable = 'eslint_d'
+let g:ale_javascript_eslint_use_global = 1
+" autofix visually selected area with eslint_d
+vnoremap <leader>f :!eslint_d --stdin --fix-to-stdout<CR>gv
 
 " setup up debugger "
 lua << EOF
@@ -993,20 +999,7 @@ EOF
 
 " setup indent blankline "
 lua << EOF
-require("indent_blankline").setup {
-    -- for example, context is off by default, use this to turn it on
-    show_current_context = true,
-    show_current_context_start = true,
-}
-EOF
-
-lua << EOF
-vim.opt.list = true
-vim.opt.listchars:append "eol:↴"
-
-require("indent_blankline").setup {
-    show_end_of_line = true,
-}
+require("ibl").setup()
 EOF
 
 " set up mastodon.nvim "
