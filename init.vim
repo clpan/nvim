@@ -486,6 +486,7 @@ let g:tagalong_verbose = 1
 " emmet-vim 
 " to load boilerplate: type !, move cursor to '!', then press <C-y>,
 " only function in normal mode
+" select entire tag: v-a-t. Source: https://stackoverflow.com/a/41616833
 let g:user_emmet_mode='n'
 let g:user_emmet_install_global = 0
 autocmd FileType html,css EmmetInstall
@@ -909,7 +910,10 @@ function! CommentToggle()
     execute ':silent! s/^\( *\)' . escape(b:comment_leader,'\/') . ' \?' . escape(b:comment_leader,'\/') . ' \?/\1/'
 endfunction
 map <silent> <leader><Space> :call CommentToggle()<CR>
-
+" commenting html: https://stackoverflow.com/a/75526410
+nnoremap <silent> <leader>h :set lazyredraw<cr>mhvato<ESC>i<!-- <ESC>vatA --><ESC>`h:set nolazyredraw<cr>
+nnoremap <silent> <leader>H :set lazyredraw<cr>mhvat<ESC>4xvato<ESC>5X`h:set nolazyredraw<cr>
+" autocmd FileType html nnoremap <silent> <leader>h :set lazyredraw<cr>mhvato<ESC>i<!-- <ESC>vatA --><ESC>`h:set nolazyredraw<cr>
 " ale
 " map <C-e> <Plug>(ale_next_wrap)
 " map <C-r> <Plug>(ale_previous_wrap)
