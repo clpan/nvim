@@ -84,6 +84,9 @@ Plug 'mfussenegger/nvim-dap'
 Plug 'puremourning/vimspector'
 Plug 'rcarriga/nvim-dap-ui'
 Plug 'neovim/nvim-lspconfig'
+"web development
+Plug 'mattn/emmet-vim'
+Plug 'AndrewRadev/tagalong.vim'
 " colorscheme
 Plug 'romgrk/doom-one.vim'
 Plug 'github/copilot.vim'
@@ -467,13 +470,26 @@ let g:UltiSnipsSnippetDirectories=[$HOME.'/.config/nvim/vim-snippets/UltiSnips']
 let g:UltiSnipsExpandTrigger  = '<Tab>'
 let g:UltiSnipsJumpForwardTrigger = '<Tab>'
 " let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
-autocmd FileType tex       let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
+autocmd FileType tex,html,css       let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
 " open snippets files with user defined command, type :Texs to open tex.snippets horizontally
 let g:tex_snippets_path = expand("~/.config/nvim/vim-snippets/UltiSnips/tex.snippets")
 command! Texs execute "split" . g:tex_snippets_path
 " add a keybind to reload snippets after making changes. source: https://ejmastnak.github.io/tutorials/vim-latex/ultisnips.html#tip-refreshing-snippets
 " unresolved - function not found #TODO
 nnoremap <leader>rl <cmd>call UtilSnips#RefreshSnippets()<CR>
+
+" config for web development ====
+" tagalong
+let g:tagalong_filetype = ['html']
+let g:tagalong_verbose = 1
+
+" emmet-vim 
+" to load boilerplate: type !, move cursor to '!', then press <C-y>,
+" only function in normal mode
+let g:user_emmet_mode='n'
+let g:user_emmet_install_global = 0
+autocmd FileType html,css EmmetInstall
+
 " config for vim-slime and vim-islime2 ====
 " use <C-c><C-c> to send script to target terminal for REPL
 " also need to add `map c-c<Esc>` in "/kitty.conf"
