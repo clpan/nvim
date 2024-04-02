@@ -28,6 +28,10 @@ endif
 " disable plugin auto-pair keybind <C-h> before loading
 let g:AutoPairsMapCh = 0
 
+" disable unloaded providers
+let g:loaded_perl_provider = 0
+let g:loaded_ruby_provider = 0
+
 call plug#begin()
 " call plug#begin("~/.nvim/plugged")
 " Plug 'tpope/vim-sensible'
@@ -83,6 +87,7 @@ Plug 'kode-team/mastodon.nvim'
 Plug 'mfussenegger/nvim-dap'
 Plug 'puremourning/vimspector'
 Plug 'rcarriga/nvim-dap-ui'
+Plug 'nvim-neotest/nvim-nio'
 Plug 'neovim/nvim-lspconfig'
 "web development
 Plug 'mattn/emmet-vim'
@@ -90,6 +95,11 @@ Plug 'AndrewRadev/tagalong.vim'
 " colorscheme
 Plug 'romgrk/doom-one.vim'
 Plug 'github/copilot.vim'
+Plug 'prettier/vim-prettier', { 'do': 'yarn install --frozen-lockfile --production' }
+Plug 'ap/vim-css-color'
+Plug 'lukas-reineke/headlines.nvim'
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
+
 " Plug 'bennypowers/nvim-regexplainer'
 " Plug 'python-mode/python-mode', { 'for': 'python', 'branch': 'develop' }
         " PLug ''
@@ -485,9 +495,11 @@ let g:tagalong_verbose = 1
 
 " emmet-vim 
 " to load boilerplate: type !, move cursor to '!', then press <C-y>,
+" use emmet-vim to load boilerplate: type 'html:5,', move cursor to ',' then
+" press <C-y>,
 " only function in normal mode
 " select entire tag: v-a-t. Source: https://stackoverflow.com/a/41616833
-let g:user_emmet_mode='n'
+" let g:user_emmet_mode='n'
 let g:user_emmet_install_global = 0
 autocmd FileType html,css EmmetInstall
 
@@ -821,10 +833,10 @@ elseif has('linux')
     nnoremap <A-h> :wincmd h<CR>
     nnoremap <A-l> :wincmd l<CR>
     let g:kitty_navigator_no_mappings = 1
-    nnoremap <silent> <A-h> :KittyNavigateLeft<cr>
-    nnoremap <silent> <A-j> :KittyNavigateDown<cr>
-    nnoremap <silent> <A-k> :KittyNavigateUp<cr>
-    nnoremap <silent> <A-l> :KittyNavigateRight<cr>
+    nnoremap <silent> <a-h> :KittyNavigateLeft<cr>
+    nnoremap <silent> <a-j> :KittyNavigateDown<cr>
+    nnoremap <silent> <a-k> :KittyNavigateUp<cr>
+    nnoremap <silent> <a-l> :KittyNavigateRight<cr>
 endif
 " move through buffers
 " nmap <leader>[ :bp!<CR>
@@ -893,7 +905,7 @@ autocmd VimEnter * call StartUp()
 autocmd VimEnter * NERDTree
 autocmd VimEnter * wincmd p
 
-" commeting
+" commenting
 " source: https://stackoverflow.com/a/22246318
 autocmd FileType c,cpp,java,scala     let b:comment_leader = '//'
 autocmd FileType javascript           let b:comment_leader = '//'
@@ -905,9 +917,49 @@ autocmd FileType tex                  let b:comment_leader = '%'
 autocmd FileType mail                 let b:comment_leader = '>'
 autocmd FileType vim                  let b:comment_leader = '"'
 autocmd FileType lua                  let b:comment_leader = '--'
+autocmd FileType css                  let b:comment_leader = '/*'
+autocmd FileType html,xhtml,xml       let b:comment_leader = '<!--'
 function! CommentToggle()
-    execute ':silent! s/\([^ ]\)/' . escape(b:comment_leader,'\/') . ' \1/'
-    execute ':silent! s/^\( *\)' . escape(b:comment_leader,'\/') . ' \?' . escape(b:comment_leader,'\/') . ' \?/\1/'
+    let comment_leader = b:comment_leader
+    let comment_start = ''
+    let comment_end = ''
+
+    if &filetype == 'css'
+        let comment_start = '/*'
+        let comment_end = '*/'
+    elseif &filetype == 'html' || &filetype == 'xhtml' || &filetype == 'xml'
+        let comment_start = '<!--'
+        let comment_end = '-->'
+    endif
+
+    " if comment_start != ''
+        " Check if the line is already commented
+        " let is_commented = getline('.') =~ '\v^\s*' . escape(comment_start, '/') . '.*' . escape(comment_end, '/') . '\s*$'
+
+  " Get the current line number
+    let line_number = line('.')
+
+    " Toggle commenting
+    if comment_start != ''
+        " Check if the line is already commented
+        let is_commented = match(getline(line_number), '\v^\s*' . escape(comment_start, '/') . '.*' . escape(comment_end, '/') . '\s*$') != -1
+        if is_commented
+            " Uncomment the line
+            execute 'silent! s/\v^\s*' . escape(comment_start, '/') . '(.*)' . escape(comment_end, '/') . '\s*/\1/'
+        else
+            " Comment out the line
+            execute 'silent! s/\v^\s*/\=comment_start/'
+            execute 'silent! s/\v\s*$/\=comment_end/'
+        endif
+    else
+        " If the filetype is not CSS or HTML, use the existing CommentToggle logic
+        " execute ':silent! s/\([^ ]\)/' . escape(comment_leader,'\/') . ' \1/'
+        " execute ':silent! s/^\( *\)' . escape(comment_leader,'\/') . ' \?' . escape(comment_leader,'\/') . ' \?/\1/'
+        execute ':silent! s/\v^\s*' . escape(comment_leader, '/') . '\s*\([^ ]\)/\1/'
+        execute ':silent! s/\v^\s*' . escape(comment_leader, '/') . '\s*$/'
+    endif
+    " execute ':silent! s/\([^ ]\)/' . escape(b:comment_leader,'\/') . ' \1/'
+    " execute ':silent! s/^\( *\)' . escape(b:comment_leader,'\/') . ' \?' . escape(b:comment_leader,'\/') . ' \?/\1/'
 endfunction
 map <silent> <leader><Space> :call CommentToggle()<CR>
 " commenting html: https://stackoverflow.com/a/75526410
@@ -1025,4 +1077,9 @@ EOF
 " set up mastodon.nvim "
 lua << EOF
 require("mastodon").setup()
+EOF
+
+" set up headlines.nvim"
+lua << EOF
+require("headlines").setup()
 EOF
